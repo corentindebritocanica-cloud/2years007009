@@ -39,7 +39,7 @@ Propriétés du script :
 - `TEST_DEBUT` = `2026-10-06T20:00:00+02:00` → étape 1 à cette heure, puis une étape toutes les…
 - `TEST_PAS` = `10` (minutes).
 
-La fenêtre horaire est ignorée en mode test. **Supprimer `TEST_DEBUT`** et remettre le jeu à zéro (admin → Réglages) avant le 12 octobre.
+La fenêtre horaire est ignorée en mode test. **En mode test, les notifs partent uniquement vers les appareils « admin » et aucun e-mail n'est envoyé à la joueuse.** **Supprimer `TEST_DEBUT`** et remettre le jeu à zéro (admin → Réglages) avant le 12 octobre.
 
 ## Fonctions utiles dans l'éditeur
 

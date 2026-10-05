@@ -57,7 +57,7 @@ function tick() {
       var p = lireDoc_('progression/' + k);
       if (p && p.termineeA) { patcher_('etapes/' + k, { relanceSautee: true }); return; }
       var meta = meta_();
-      var r = envoyerPush_('joueuse', {
+      var r = envoyerPush_(cibleJeu_(), {
         titre: meta.relanceTitre || "Tu n'as pas oublié ?",
         texte: meta.relanceTexte || 'Ton étape t\'attend toujours 💛',
         etape: String(k)
@@ -81,7 +81,7 @@ function debloquer_(n, mode, notifier) {
   if (notifier === false) return { ok: true };
 
   var meta = meta_();
-  var r = envoyerPush_('joueuse', {
+  var r = envoyerPush_(cibleJeu_(), {
     titre: meta.titre || 'Une nouvelle étape t\'attend',
     texte: meta.texte || 'Ouvre l\'app quand tu es prête ✨',
     etape: String(n)
@@ -195,10 +195,15 @@ function envoyerFcm_(jeton, data) {
   return { ok: false, erreur: statut || ('HTTP_' + code) };
 }
 
+// Mode test (propriété TEST_DEBUT) : les notifs du jeu partent vers les appareils
+// « admin » seulement, et aucun e-mail n'est envoyé à la joueuse. Elle ne voit rien.
+function modeTest_() { return !!prop_('TEST_DEBUT'); }
+function cibleJeu_() { return modeTest_() ? 'admin' : 'joueuse'; }
+
 function repliEmail_(n, erreur) {
   var lien = CONFIG.URL_APP + '?etape=' + n;
   try {
-    if (prop_('EMAIL_JOUEUSE')) {
+    if (prop_('EMAIL_JOUEUSE') && !modeTest_()) {
       MailApp.sendEmail({
         to: prop_('EMAIL_JOUEUSE'),
         subject: 'Une nouvelle étape t\'attend ✨',
