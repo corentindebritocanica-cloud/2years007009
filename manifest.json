@@ -1,6 +1,6 @@
 {
-  "name": "Notre jeu",
-  "short_name": "Notre jeu",
+  "name": "2 ANS",
+  "short_name": "2 ANS",
   "description": "Un jeu de piste, une étape à la fois.",
   "lang": "fr",
   "start_url": "./",
@@ -11,7 +11,17 @@
   "background_color": "#140d17",
   "theme_color": "#140d17",
   "icons": [
-    { "src": "img/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "img/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "img/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

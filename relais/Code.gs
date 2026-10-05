@@ -18,8 +18,7 @@ var CONFIG = {
   PROJET: 'years-b3e18',
   API_KEY: 'AIzaSyD65D8kOjDkDY6pCZkyQ1f6Md40NORhGHA',     // clé web publique (vérif. des jetons)
   UID_COMPTE: 'wg2JcW2kfkTGr1AB7ROEubZtL9h1',            // compte unique partagé (Lisa + Corentin)
-  EMAIL_ADMIN: 'corentin.debritocanica@gmail.com',
-  EMAIL_JOUEUSE: '',                                       // e-mail de repli si la notif échoue
+  // E-mails : dans Propriétés du script (EMAIL_ADMIN, EMAIL_JOUEUSE), jamais dans le dépôt public.
   URL_APP: 'https://corentindebritocanica-cloud.github.io/2years007009/',
   FENETRE_DEBUT: '21:25',                                  // hors fenêtre, tick() sort aussitôt
   FENETRE_FIN: '00:15',
@@ -199,16 +198,16 @@ function envoyerFcm_(jeton, data) {
 function repliEmail_(n, erreur) {
   var lien = CONFIG.URL_APP + '?etape=' + n;
   try {
-    if (CONFIG.EMAIL_JOUEUSE) {
+    if (prop_('EMAIL_JOUEUSE')) {
       MailApp.sendEmail({
-        to: CONFIG.EMAIL_JOUEUSE,
+        to: prop_('EMAIL_JOUEUSE'),
         subject: 'Une nouvelle étape t\'attend ✨',
         htmlBody: '<p>Une nouvelle étape vient de s\'ouvrir.</p><p><a href="' + lien + '">Ouvre l\'app</a> (depuis son icône sur ton écran d\'accueil).</p>'
       });
     }
-    MailApp.sendEmail(CONFIG.EMAIL_ADMIN, '[Jeu] Notif étape ' + n + ' échouée : ' + erreur,
+    MailApp.sendEmail(prop_('EMAIL_ADMIN'), '[Jeu] Notif étape ' + n + ' échouée : ' + erreur,
       'L\'étape ' + n + ' est bien débloquée, mais la notification push a échoué (' + erreur + ').\n' +
-      (CONFIG.EMAIL_JOUEUSE ? 'Un e-mail de repli lui a été envoyé.\n' : 'Pas d\'e-mail de repli (EMAIL_JOUEUSE vide).\n') +
+      (prop_('EMAIL_JOUEUSE') ? 'Un e-mail de repli lui a été envoyé.\n' : 'Pas d\'e-mail de repli (EMAIL_JOUEUSE vide).\n') +
       'Pense à lui faire rouvrir l\'app pour rafraîchir son jeton.');
     journal_('repli_email', n, erreur);
   } catch (err) {

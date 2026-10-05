@@ -93,7 +93,7 @@ function ecranConnexion() {
   racine.replaceChildren(h("main", { class: "ecran centre" },
     h("div", { class: "pile", style: "text-align:center;align-items:center" },
       h("img", { src: "img/icone-192.png", alt: "", width: 84, height: 84, style: "border-radius:22px;box-shadow:var(--ombre)" }),
-      h("h1", {}, "Notre jeu"),
+      h("h1", {}, "2 ANS"),
       h("p", { class: "doux" }, "Connecte-toi une seule fois : l'app s'en souviendra.")),
     pasInstallee ? tutoInstallation() : null,
     form));

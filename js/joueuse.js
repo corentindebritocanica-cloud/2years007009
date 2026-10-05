@@ -161,7 +161,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
 
   // Logo en bas de l'accueil : ouvre le pavé à code, puis l'espace admin.
   function piedDePage() {
-    const logo = h("button", { class: "logo-pied", "aria-label": "Notre jeu" },
+    const logo = h("button", { class: "logo-pied", "aria-label": "2 ANS" },
       h("img", { src: "img/icone-192.png", alt: "", width: 44, height: 44 }));
     logo.addEventListener("click", async () => {
       if (!ouvrirAdmin) return;
@@ -178,7 +178,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
     if (Notification.permission === "granted") return null;
     if (Notification.permission === "denied") {
       return h("div", { class: "bandeau alerte" },
-        "Les notifications sont bloquées. Réactive-les dans Réglages → Notifications → Notre jeu.");
+        "Les notifications sont bloquées. Réactive-les dans Réglages → Notifications → 2 ANS.");
     }
     const msg = h("p", { class: "message" });
     const btn = h("button", { class: "btn plein" }, "Activer les notifications");

@@ -1,7 +1,7 @@
 {
   "meta": {
     "prenom": "Lisa",
-    "nomJeu": "Notre jeu",
+    "nomJeu": "2 ANS",
     "accueil": "Texte d'accueil du 12 octobre — À REMPLIR",
     "signature": "Corentin",
     "notif": {
@@ -21,9 +21,9 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 1 — À REMPLIR",
+        "texte": "Quel est le premier film qu'on a vu ensemble ?",
         "reponses": [
-          "reponse"
+          "vaiana"
         ],
         "indice": ""
       },
@@ -34,7 +34,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "Le choix du film était totalement décomplexé. Une belle femme, notre premier date de 2025, un dessin animé. Mais le plus drôle, c'est qu'à aucun moment je ne me suis demandé si c'était une bonne idée. C'était juste naturel, dans ce monde d'adulte, d'aller voir un film pour notre enfant intérieur."
       }
     },
     {
@@ -46,7 +46,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 2 — À REMPLIR",
+        "texte": "Quelle petite habitude de moi te fait sourire ?",
         "motApres": ""
       },
       "jeu": {
@@ -89,9 +89,9 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 3 — À REMPLIR",
+        "texte": "Comment s'appelle le lieu où on s'est rencontrés ?",
         "reponses": [
-          "reponse"
+          "diagora"
         ],
         "indice": ""
       },
@@ -115,7 +115,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 4 — À REMPLIR",
+        "texte": "Qu'est-ce que tu n'as jamais osé me dire ?",
         "motApres": ""
       },
       "jeu": {
@@ -137,9 +137,10 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 5 — À REMPLIR",
+        "texte": "Qui a dit « je t'aime » en premier ?",
         "reponses": [
-          "reponse"
+          "Lisa",
+          "moi"
         ],
         "indice": ""
       },
@@ -183,7 +184,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 6 — À REMPLIR",
+        "texte": "Qu'est-ce que tu aimerais qu'on apprenne ensemble ?",
         "motApres": ""
       },
       "jeu": {
@@ -206,9 +207,10 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 7 — À REMPLIR",
+        "texte": "Quelle est ma pointure ?",
         "reponses": [
-          "reponse"
+          "40",
+          "41"
         ],
         "indice": ""
       },
@@ -231,7 +233,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 8 — À REMPLIR",
+        "texte": "Quel rêve aimerais-tu qu'on réalise ensemble ?",
         "motApres": ""
       },
       "jeu": {
@@ -253,9 +255,10 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 9 — À REMPLIR",
+        "texte": "Quelle danse on a présentée à notre première compétition ensemble ?",
         "reponses": [
-          "reponse"
+          "east coast swing",
+          "ECS"
         ],
         "indice": ""
       },
@@ -278,7 +281,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 10 — À REMPLIR",
+        "texte": "Si tu pouvais revivre une journée avec moi, laquelle ?",
         "motApres": ""
       },
       "jeu": {
@@ -302,9 +305,12 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 11 — À REMPLIR",
+        "texte": "Quel est le premier restaurant où on est allés ?",
         "reponses": [
-          "reponse"
+          "3 brasseurs",
+          "les 3 brasseurs",
+          "trois brasseurs",
+          "les trois brasseurs"
         ],
         "indice": ""
       },
@@ -315,22 +321,22 @@
         "options": [
           {
             "id": "l1",
-            "nom": "Leurre 1 (À REMPLIR)",
+            "nom": "Paris",
             "image": "img/jeu/leurre-1.svg"
           },
           {
             "id": "l2",
-            "nom": "Leurre 2 (À REMPLIR)",
+            "nom": "Lens",
             "image": "img/jeu/leurre-2.svg"
           },
           {
             "id": "l3",
-            "nom": "Leurre 3 (À REMPLIR)",
+            "nom": "Perpignan",
             "image": "img/jeu/leurre-3.svg"
           },
           {
             "id": "l4",
-            "nom": "Leurre 4 (À REMPLIR)",
+            "nom": "Pays basque",
             "image": "img/jeu/leurre-4.svg"
           }
         ],
@@ -351,7 +357,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 12 — À REMPLIR",
+        "texte": "Quel voyage rêves-tu de faire avec moi ?",
         "motApres": ""
       },
       "jeu": {
@@ -375,9 +381,11 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 13 — À REMPLIR",
+        "texte": "Quelle a été la destination de nos premières vacances ?",
         "reponses": [
-          "reponse"
+          "malte",
+          "à Malte",
+          "en Malte"
         ],
         "indice": ""
       },
@@ -388,22 +396,22 @@
         "options": [
           {
             "id": "l1",
-            "nom": "Leurre 1 (À REMPLIR)",
+            "nom": "Paris",
             "image": "img/jeu/leurre-1.svg"
           },
           {
             "id": "l2",
-            "nom": "Leurre 2 (À REMPLIR)",
+            "nom": "Lens",
             "image": "img/jeu/leurre-2.svg"
           },
           {
             "id": "l3",
-            "nom": "Leurre 3 (À REMPLIR)",
+            "nom": "Perpignan",
             "image": "img/jeu/leurre-3.svg"
           },
           {
             "id": "l4",
-            "nom": "Leurre 4 (À REMPLIR)",
+            "nom": "Pays basque",
             "image": "img/jeu/leurre-4.svg"
           }
         ],
@@ -426,7 +434,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 14 — À REMPLIR",
+        "texte": "Quel endroit est devenu « notre endroit » pour toi ?",
         "motApres": ""
       },
       "jeu": {
@@ -450,9 +458,12 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 15 — À REMPLIR",
+        "texte": "Qu'est-ce qu'on a mangé à notre premier dîner à mon appartement ?",
         "reponses": [
-          "reponse"
+          "Sushi",
+          "des Sushi",
+          "sushis",
+          "des sushis"
         ],
         "indice": ""
       },
@@ -475,7 +486,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 16 — À REMPLIR",
+        "texte": "Si nos deux ans étaient un livre, quel serait son titre ?",
         "motApres": ""
       },
       "jeu": {
@@ -485,22 +496,22 @@
         "options": [
           {
             "id": "l1",
-            "nom": "Leurre 1 (À REMPLIR)",
+            "nom": "Paris",
             "image": "img/jeu/leurre-1.svg"
           },
           {
             "id": "l2",
-            "nom": "Leurre 2 (À REMPLIR)",
+            "nom": "Lens",
             "image": "img/jeu/leurre-2.svg"
           },
           {
             "id": "l3",
-            "nom": "Leurre 3 (À REMPLIR)",
+            "nom": "Perpignan",
             "image": "img/jeu/leurre-3.svg"
           },
           {
             "id": "l4",
-            "nom": "Leurre 4 (À REMPLIR)",
+            "nom": "Pays basque",
             "image": "img/jeu/leurre-4.svg"
           }
         ],
@@ -524,9 +535,10 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 17 — À REMPLIR",
+        "texte": "Quel est le premier message que je t'ai envoyé ?",
         "reponses": [
-          "reponse"
+          "un gif",
+          "gif"
         ],
         "indice": ""
       },
@@ -549,7 +561,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 18 — À REMPLIR",
+        "texte": "Qu'est-ce que tu ressens quand on danse ensemble ?",
         "motApres": ""
       },
       "jeu": {
@@ -573,9 +585,12 @@
       "manuel": false,
       "question": {
         "type": "verifiable",
-        "texte": "Question 19 — À REMPLIR",
+        "texte": "Quelle série on a regardée en entier ensemble ?",
         "reponses": [
-          "reponse"
+          "grey's anatomy",
+          "greys anatomy",
+          "grey anatomy",
+          "desperate housewives"
         ],
         "indice": ""
       },
@@ -598,7 +613,7 @@
       "manuel": false,
       "question": {
         "type": "profonde",
-        "texte": "Question 20 — À REMPLIR",
+        "texte": "Qu'est-ce qui te manque le plus quand on n'est pas ensemble ?",
         "motApres": ""
       },
       "jeu": {
@@ -621,9 +636,12 @@
       "manuel": true,
       "question": {
         "type": "verifiable",
-        "texte": "Question 21 — À REMPLIR",
+        "texte": "Avec quel dessert je suis le plus difficile ?",
         "reponses": [
-          "reponse"
+          "Crème brûlée",
+          "la crème brûlée",
+          "crème catalane",
+          "la crème catalane"
         ],
         "indice": ""
       },

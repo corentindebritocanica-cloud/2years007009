@@ -10,8 +10,12 @@ Gratuit (compte Google perso), pas de Cloud Functions, pas de plan Blaze.
    - Fuseau horaire : **Europe/Paris** ;
    - cocher « Afficher le fichier manifeste appsscript.json ».
 3. Remplacer le contenu de `Code.gs` par [`Code.gs`](Code.gs) et celui de `appsscript.json` par [`appsscript.json`](appsscript.json).
-4. Dans `CONFIG` en haut de `Code.gs`, renseigner `EMAIL_JOUEUSE` (e-mail de repli de Lisa).
-5. ⚙️ **Propriétés du script** → ajouter `SA_KEY` = le JSON complet du compte de service, **sur une seule ligne**.
+4. ⚙️ **Propriétés du script** → ajouter :
+   - `SA_KEY` = le JSON complet du compte de service, **sur une seule ligne** ;
+   - `EMAIL_ADMIN` = ton e-mail (alertes) ;
+   - `EMAIL_JOUEUSE` = l'e-mail de Lisa (repli si une notif échoue).
+   Les e-mails restent hors du dépôt, qui est public.
+5. (rien à modifier dans le code)
 6. Exécuter `testerConnexion` (autoriser les accès demandés). Le journal doit afficher le calendrier.
 7. Exécuter `installer` : crée le déclencheur `tick` toutes les 5 minutes.
 8. **Déployer → Nouveau déploiement → Application Web** : exécuter en tant que *moi*, accès *Tout le monde*.
