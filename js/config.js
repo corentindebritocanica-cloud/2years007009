@@ -25,7 +25,7 @@ export const CODE_ADMIN_SHA256 = "3e19fbca585162609ed70502d09ab5681fb7e4909936bf
 // URL « …/exec » du relais Apps Script, à coller après son déploiement.
 // Tant qu'elle est vide, le déblocage manuel écrit directement dans Firestore
 // (l'étape s'ouvre) mais aucune notification push ne part.
-export const RELAIS_URL = "";
+export const RELAIS_URL = "https://script.google.com/macros/s/AKfycbwTnWOQe__VGYBIA7-ptJ6Dgy1F0Hmh86IEJT20eeAHAgXpmdNsLqii4qkZE7wGDHYTkw/exec";
 
 // Clé publique VAPID (Firebase → Paramètres → Cloud Messaging → Certificats Web Push).
 // Laisser vide = clé par défaut de Firebase, qui fonctionne aussi.
