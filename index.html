@@ -25,6 +25,86 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
+  <!-- Écran de lancement : du 13 décembre 2024 à aujourd'hui en 2 secondes.
+       En HTML pur pour s'afficher avant même le chargement de l'app. -->
+  <div id="lancement" aria-hidden="true">
+    <div class="l-sur">Depuis le 13 décembre 2024</div>
+    <div class="l-date"><span id="l-jour">13</span> <span id="l-mois">décembre</span></div>
+    <div class="l-annee" id="l-annee">2024</div>
+    <div class="l-ligne"><span id="l-barre"></span></div>
+    <div class="l-jours"><span id="l-nb">0</span> jours ensemble</div>
+  </div>
+  <style>
+    #lancement {
+      position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 6px; text-align: center;
+      background: #140d17;
+      background-image: radial-gradient(120% 70% at 50% -10%, rgba(232,131,107,.22), transparent 60%);
+      color: #f6ede6; font-family: "Fraunces", Georgia, serif;
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    @media (prefers-color-scheme: light) {
+      #lancement { background: #f8f1ea; background-image: radial-gradient(120% 70% at 50% -10%, rgba(196,85,60,.12), transparent 60%); color: #2a1b24; }
+      #lancement .l-sur, #lancement .l-jours { color: rgba(42,27,36,.6); }
+      #lancement .l-annee { color: #b8692c; }
+      #lancement .l-ligne { background: rgba(42,27,36,.1); }
+    }
+    #lancement.fin { opacity: 0; transform: scale(1.04); pointer-events: none; }
+    #lancement .l-sur { font: 600 .74rem/1 -apple-system, system-ui, sans-serif; letter-spacing: .3em; text-transform: uppercase; color: rgba(246,237,230,.55); margin-bottom: 8px; }
+    #lancement .l-date { font-size: clamp(2.4rem, 11vw, 3.4rem); font-weight: 600; line-height: 1.05; font-variant-numeric: tabular-nums; }
+    #lancement .l-annee { font-size: clamp(3.4rem, 17vw, 5rem); font-weight: 600; line-height: 1; color: #f3c98b; font-variant-numeric: tabular-nums; }
+    #lancement .l-ligne { width: 160px; height: 3px; border-radius: 3px; background: rgba(246,237,230,.12); overflow: hidden; margin: 18px 0 8px; }
+    #lancement .l-ligne span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #e8836b, #f3c98b); }
+    #lancement .l-jours { font: 500 .95rem/1 -apple-system, system-ui, sans-serif; color: rgba(246,237,230,.6); font-variant-numeric: tabular-nums; }
+    #lancement.arrive .l-date, #lancement.arrive .l-annee { animation: l-pulse .6s ease; }
+    @keyframes l-pulse { 40% { transform: scale(1.06); } }
+  </style>
+  <script>
+    (function () {
+      var el = document.getElementById("lancement");
+      var depart = new Date(2024, 11, 13).getTime();
+      var auj = new Date(); auj.setHours(0, 0, 0, 0);
+      var fin = auj.getTime(), duree = 2000, t0 = null;
+      var fmt = function (ms, opt) { return new Intl.DateTimeFormat("fr-FR", opt).format(new Date(ms)); };
+      var J = document.getElementById("l-jour"), M = document.getElementById("l-mois"),
+          A = document.getElementById("l-annee"), N = document.getElementById("l-nb"), B = document.getElementById("l-barre");
+      var reduit = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var animFinie = false, appPrete = false;
+      function peindre(p) {
+        var e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; // accélère puis freine
+        var ms = depart + (fin - depart) * e;
+        J.textContent = fmt(ms, { day: "numeric" });
+        M.textContent = fmt(ms, { month: "long" });
+        A.textContent = fmt(ms, { year: "numeric" });
+        N.textContent = Math.round((ms - depart) / 86400000);
+        B.style.width = (p * 100) + "%";
+      }
+      function cacher() {
+        if (!animFinie || !appPrete || !el) return;
+        el.classList.add("fin");
+        setTimeout(function () { el && el.remove(); el = null; }, 550);
+      }
+      function boucle(t) {
+        if (t0 === null) t0 = t;
+        var p = Math.min(1, (t - t0) / duree);
+        peindre(p);
+        if (p < 1) return requestAnimationFrame(boucle);
+        el.classList.add("arrive");
+        setTimeout(function () { animFinie = true; cacher(); }, 650);
+      }
+      if (reduit) { peindre(1); animFinie = true; } else requestAnimationFrame(boucle);
+      // L'app est prête dès que son écran de chargement interne disparaît.
+      document.addEventListener("DOMContentLoaded", function () {
+        var app = document.getElementById("app");
+        var obs = new MutationObserver(function () {
+          if (app.firstElementChild && !app.querySelector(".chargement")) { appPrete = true; obs.disconnect(); cacher(); }
+        });
+        obs.observe(app, { childList: true });
+      });
+      // Sécurité : jamais bloqué plus de 8 s.
+      setTimeout(function () { appPrete = true; animFinie = true; cacher(); }, 8000);
+    })();
+  </script>
   <div id="app" aria-live="polite"></div>
   <noscript><p style="padding:24px">Active JavaScript pour jouer.</p></noscript>
   <script type="module" src="js/app.js"></script>
