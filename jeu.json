@@ -2,7 +2,7 @@
   "meta": {
     "prenom": "Lisa",
     "nomJeu": "2 ANS",
-    "accueil": "Texte d'accueil du 12 octobre — À REMPLIR",
+    "accueil": "Nos deux ans arrivent, et j'ai voulu les fêter autrement. Ce jeu est pour toi. Chaque étape te rapproche d'une surprise.",
     "signature": "Corentin",
     "notif": {
       "titre": "Une nouvelle étape t'attend",
@@ -23,7 +23,10 @@
         "type": "verifiable",
         "texte": "Quel est le premier film qu'on a vu ensemble ?",
         "reponses": [
-          "vaiana"
+          "vaiana",
+          "moana",
+          "vaiana 2",
+          "moana 2"
         ],
         "indice": ""
       },
@@ -47,7 +50,7 @@
       "question": {
         "type": "profonde",
         "texte": "Quelle petite habitude de moi te fait sourire ?",
-        "motApres": ""
+        "motApres": "Je vais faire exprès de le refaire, maintenant que je sais."
       },
       "jeu": {
         "type": "memoire",
@@ -77,7 +80,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "Mon premier message, c'était un gif. Pas une phrase travaillée, pas une déclaration : un gif. J'ai hésité longtemps avant de l'envoyer, je l'ai changé plusieurs fois. C'était ma façon de te dire bonjour sans trop me dévoiler."
       }
     },
     {
@@ -91,7 +94,9 @@
         "type": "verifiable",
         "texte": "Comment s'appelle le lieu où on s'est rencontrés ?",
         "reponses": [
-          "diagora"
+          "diagora",
+          "le diagora",
+          "labège"
         ],
         "indice": ""
       },
@@ -103,7 +108,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "À notre première compétition, sur l'East Coast Swing, j'avais le trac pour toi plus que pour moi. Quand la musique a commencé, tu m'as regardé, et j'ai su qu'on était une vraie équipe, sur la piste et en dehors."
       }
     },
     {
@@ -116,7 +121,7 @@
       "question": {
         "type": "profonde",
         "texte": "Qu'est-ce que tu n'as jamais osé me dire ?",
-        "motApres": ""
+        "motApres": "Moi aussi j'ai des choses à te dire… patience."
       },
       "jeu": {
         "type": "grattage",
@@ -125,7 +130,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "La nuit de notre premier baiser, une étoile filante a traversé le ciel. J'ai pris ça comme un signe, même si je ne crois pas aux signes. Depuis, chaque fois que je lève les yeux la nuit, c'est à toi que je pense."
       }
     },
     {
@@ -172,7 +177,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "Le jour où j'ai réalisé que tu étais devenue ma personne préférée, il ne s'est rien passé de spécial. Tu riais d'une bêtise que j'avais dite, et je me suis dit : c'est elle. Pas de feu d'artifice, juste une évidence."
       }
     },
     {
@@ -185,7 +190,7 @@
       "question": {
         "type": "profonde",
         "texte": "Qu'est-ce que tu aimerais qu'on apprenne ensemble ?",
-        "motApres": ""
+        "motApres": "Ajouté à notre liste de projets à deux."
       },
       "jeu": {
         "type": "puzzle",
@@ -195,7 +200,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "Tu te moques de moi parce que je suis exigeant avec la crème brûlée. Mais chaque fois qu'on en commande une, tu me tends ta cuillère pour que je juge. C'est un petit rituel, et ce sont ces petits rituels que je préfère avec toi."
       }
     },
     {
@@ -234,7 +239,7 @@
       "question": {
         "type": "profonde",
         "texte": "Quel rêve aimerais-tu qu'on réalise ensemble ?",
-        "motApres": ""
+        "motApres": "Rêver avec toi, c'est déjà commencer."
       },
       "jeu": {
         "type": "grattage",
@@ -284,13 +289,13 @@
       "question": {
         "type": "profonde",
         "texte": "Si tu pouvais revivre une journée avec moi, laquelle ?",
-        "motApres": ""
+        "motApres": "Je revivrais toutes les journées, tant que tu y es."
       },
       "jeu": {
         "type": "cadenas",
         "consigne": "Fais tourner la molette pour gagner un chiffre du cadenas",
         "position": 1,
-        "code": "0000",
+        "code": "1612",
         "final": false
       },
       "recompense": {
@@ -360,13 +365,13 @@
       "question": {
         "type": "profonde",
         "texte": "Quel voyage rêves-tu de faire avec moi ?",
-        "motApres": ""
+        "motApres": "Partout, tant que c'est avec toi."
       },
       "jeu": {
         "type": "cadenas",
         "consigne": "Fais tourner la molette pour gagner un chiffre du cadenas",
         "position": 2,
-        "code": "0000",
+        "code": "1612",
         "final": false
       },
       "recompense": {
@@ -437,13 +442,13 @@
       "question": {
         "type": "profonde",
         "texte": "Quel endroit est devenu « notre endroit » pour toi ?",
-        "motApres": ""
+        "motApres": "J'aime qu'on ait des lieux rien qu'à nous."
       },
       "jeu": {
         "type": "cadenas",
         "consigne": "Fais tourner la molette pour gagner un chiffre du cadenas",
         "position": 3,
-        "code": "0000",
+        "code": "1612",
         "final": false
       },
       "recompense": {
@@ -489,7 +494,7 @@
       "question": {
         "type": "profonde",
         "texte": "Si nos deux ans étaient un livre, quel serait son titre ?",
-        "motApres": ""
+        "motApres": "Joli titre. Le tome 3 commence bientôt."
       },
       "jeu": {
         "type": "choix",
@@ -564,15 +569,15 @@
       "question": {
         "type": "profonde",
         "texte": "Qu'est-ce que tu ressens quand on danse ensemble ?",
-        "motApres": ""
+        "motApres": "Une danse de plus avec toi ne sera jamais de trop."
       },
       "jeu": {
         "type": "cadenas",
         "consigne": "Gagne le dernier chiffre, puis compose le code",
         "position": 4,
-        "code": "0000",
+        "code": "1612",
         "final": true,
-        "ouverture": "Message à l'ouverture du cadenas — À REMPLIR (un mot de toi + un indice, ex. « Prends ton maillot de bain »)"
+        "ouverture": "Bravo ! Indice : glisse ton maillot de bain dans ta valise."
       },
       "recompense": {
         "titre": "Ta récompense",
@@ -617,7 +622,7 @@
       "question": {
         "type": "profonde",
         "texte": "Qu'est-ce qui te manque le plus quand on n'est pas ensemble ?",
-        "motApres": ""
+        "motApres": "Encore trois jours…"
       },
       "jeu": {
         "type": "puzzle",

@@ -107,7 +107,7 @@ export function confettis() {
   const ctx = c.getContext("2d");
   const dpr = Math.min(devicePixelRatio || 1, 2);
   c.width = innerWidth * dpr; c.height = innerHeight * dpr; ctx.scale(dpr, dpr);
-  const couleurs = ["#f3c98b", "#e8836b", "#ffd9e0", "#8fd3a8", "#fff"];
+  const couleurs = ["#a8201a", "#1f3a5f", "#5a3e1b", "#e3b23c", "#f1e7d3"];
   const parts = Array.from({ length: 120 }, () => ({
     x: innerWidth / 2 + (Math.random() - 0.5) * 80, y: innerHeight * 0.35,
     vx: (Math.random() - 0.5) * 9, vy: -Math.random() * 11 - 4,
@@ -133,4 +133,15 @@ export function tutoInstallation() {
       h("li", {}, "Choisis « Sur l'écran d'accueil »"),
       h("li", {}, "Ouvre l'app depuis sa nouvelle icône et connecte-toi là-bas")),
     h("p", { class: "discret" }, "Sans ça, l'iPhone ne peut pas t'envoyer les notifications."));
+}
+
+// Rayons art déco + étoile rouge (en-têtes).
+export function rayons() {
+  const svg = h("svg", { class: "rayons", viewBox: "0 0 300 46", "aria-hidden": "true" });
+  svg.innerHTML = `<g fill="none" stroke="currentColor" stroke-width="1">
+    <line x1="150" y1="44" x2="20" y2="10"/><line x1="150" y1="44" x2="60" y2="4"/><line x1="150" y1="44" x2="105" y2="1"/>
+    <line x1="150" y1="44" x2="150" y2="0"/><line x1="150" y1="44" x2="195" y2="1"/><line x1="150" y1="44" x2="240" y2="4"/>
+    <line x1="150" y1="44" x2="280" y2="10"/></g>
+    <path class="etoile" d="M150 14 L154 26 L166 26 L156 33 L160 45 L150 38 L140 45 L144 33 L134 26 L146 26 Z"/>`;
+  return svg;
 }

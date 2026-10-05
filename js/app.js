@@ -1,6 +1,6 @@
 // Point d'entrée : connexion unique et persistante, puis routage selon le rôle
 // (joueuse → le jeu, admin → le tableau de bord, qui peut aussi prévisualiser le jeu).
-import { h, estIOS, tutoInstallation } from "./outils.js";
+import { h, estIOS, tutoInstallation, rayons } from "./outils.js";
 
 const racine = document.getElementById("app");
 const chargement = () => racine.replaceChildren(h("div", { class: "chargement" }, h("div", { class: "point" })));
@@ -92,8 +92,8 @@ function ecranConnexion() {
   const pasInstallee = estIOS() && !fb.estInstallee();
   racine.replaceChildren(h("main", { class: "ecran centre" },
     h("div", { class: "pile", style: "text-align:center;align-items:center" },
-      h("img", { src: "img/icone-192.png", alt: "", width: 84, height: 84, style: "border-radius:22px;box-shadow:var(--ombre)" }),
-      h("h1", {}, "2 ANS"),
+      h("div", { class: "hero", style: "border:0" }, rayons(), h("div", { class: "petit" }, "Nos"), h("h1", {}, "2 ans"),
+        h("div", { class: "manuscrit" }, "— entre, c'est ici que tout commence —")),
       h("p", { class: "doux" }, "Connecte-toi une seule fois : l'app s'en souviendra.")),
     pasInstallee ? tutoInstallation() : null,
     form));

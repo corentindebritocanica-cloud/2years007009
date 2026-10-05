@@ -3,7 +3,7 @@
 // En mode aperçu (admin), tout est débloqué et RIEN n'est écrit dans Firestore.
 import {
   h, reponseCorrecte, dateParis, jourLong, heureCourte, compteARebours, toDate,
-  estIOS, confettis, tutoInstallation,
+  estIOS, confettis, tutoInstallation, rayons,
 } from "./outils.js";
 import { lancerJeu } from "./jeux.js";
 import { demanderCode } from "./code.js";
@@ -129,13 +129,13 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
         maj(); minuteur = setInterval(maj, 1000);
       }
       principal = h("div", { class: "carte pile attente" },
-        h("div", { class: "lune" }, nbFinies === 0 ? "✨" : "🌙"),
+        h("div", { class: "lune" }, nbFinies === 0 ? "✦" : "☾"),
         nbFinies === 0 && jeu.meta?.accueil ? h("p", { class: "recompense", style: "text-align:center" }, jeu.meta.accueil) : null,
         compte.textContent || prochaine.heure ? compte : null,
         h("p", { class: "doux" }, texte));
     } else {
       principal = h("div", { class: "carte pile attente" },
-        h("div", { class: "lune" }, "💛"),
+        h("div", { class: "lune" }, "♥"),
         h("h2", {}, "Tout est terminé"),
         h("p", { class: "doux" }, "Il ne reste plus qu'à vivre la suite."));
     }
@@ -149,9 +149,12 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
 
     racine.replaceChildren(h("main", { class: "ecran" },
       bandeauApercu(),
-      h("header", { class: "entete" },
-        h("div", {}, h("div", { class: "surtitre" }, `${salut} ${jeu.meta?.prenom || ""}`.trim()),
-          h("div", { class: "titre-app" }, jeu.meta?.nomJeu || "Notre jeu"))),
+      h("header", { class: "hero" },
+        h("div", { class: "lieu" }, `${salut} ${jeu.meta?.prenom || ""}`.trim()),
+        rayons(),
+        h("div", { class: "petit" }, "Nos"),
+        h("h1", {}, "2 ans"),
+        h("div", { class: "manuscrit" }, "— chaque étape te rapproche d'une surprise —")),
       apercu ? null : carteNotifications(),
       principal,
       jauge,
@@ -161,13 +164,12 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
 
   // Logo en bas de l'accueil : ouvre le pavé à code, puis l'espace admin.
   function piedDePage() {
-    const logo = h("button", { class: "logo-pied", "aria-label": "2 ANS" },
-      h("img", { src: "img/icone-192.png", alt: "", width: 44, height: 44 }));
+    const logo = h("button", { class: "etoile-pied", "aria-label": "Étoile" }, "✦");
     logo.addEventListener("click", async () => {
       if (!ouvrirAdmin) return;
       if (await demanderCode()) ouvrirAdmin();
     });
-    return h("footer", { class: "pied" }, logo,
+    return h("footer", { class: "pied" }, h("div", { class: "annee" }, "Toulouse · 2026"), logo,
       lectureSeule ? h("p", { class: "discret" }, "Appareil admin · tes actions ici ne sont pas enregistrées") : null);
   }
 
