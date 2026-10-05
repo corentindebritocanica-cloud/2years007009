@@ -10,7 +10,7 @@ Gratuit (compte Google perso), pas de Cloud Functions, pas de plan Blaze.
    - Fuseau horaire : **Europe/Paris** ;
    - cocher « Afficher le fichier manifeste appsscript.json ».
 3. Remplacer le contenu de `Code.gs` par [`Code.gs`](Code.gs) et celui de `appsscript.json` par [`appsscript.json`](appsscript.json).
-4. Dans `CONFIG` en haut de `Code.gs`, renseigner `UID_JOUEUSE` et `EMAIL_JOUEUSE`.
+4. Dans `CONFIG` en haut de `Code.gs`, renseigner `EMAIL_JOUEUSE` (e-mail de repli de Lisa).
 5. ⚙️ **Propriétés du script** → ajouter `SA_KEY` = le JSON complet du compte de service, **sur une seule ligne**.
 6. Exécuter `testerConnexion` (autoriser les accès demandés). Le journal doit afficher le calendrier.
 7. Exécuter `installer` : crée le déclencheur `tick` toutes les 5 minutes.

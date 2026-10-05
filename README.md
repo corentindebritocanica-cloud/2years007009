@@ -5,17 +5,16 @@ PWA iPhone (GitHub Pages) + Firebase (Auth, Firestore, FCM) + relais Google Apps
 
 ## Accès
 
-- **Un seul écran de connexion** (e-mail + mot de passe), persistant : l'appareil reste
-  connecté tant qu'on ne se déconnecte pas (jeton Firebase en IndexedDB).
-- **Un seul accueil pour vous deux** : après connexion, tout le monde arrive sur le jeu.
-- **Logo en bas de l'accueil → code à 4 chiffres → espace admin.** Le déverrouillage tient
-  jusqu'à la fermeture de l'app (bouton « Verrouiller l'admin » dans Réglages).
-- Le code ne protège que l'écran. Les données admin (réponses, journal, déblocages) restent
-  protégées par `firestore.rules` : seul l'UID admin peut les lire.
-- Sur le compte admin, l'accueil montre l'état réel du jeu en **lecture seule** :
-  on peut jouer une étape sans rien enregistrer à la place de Lisa.
-- L'admin peut aussi **prévisualiser** tout le jeu, étapes non débloquées comprises (bouton « Aperçu »).
-- Pour changer le code : empreinte SHA-256 de `jeu-2ans:XXXX` dans `CODE_ADMIN_SHA256` (`js/config.js`).
+- **Un seul compte e-mail + mot de passe**, partagé par Lisa et Corentin. Connexion persistante :
+  l'appareil reste connecté tant qu'on ne se déconnecte pas (jeton Firebase en IndexedDB).
+- **Un seul accueil** : après connexion, tout le monde arrive sur le jeu.
+- **Logo en bas de l'accueil → code à 4 chiffres → espace admin.** C'est la seule barrière.
+  Le déverrouillage tient jusqu'à la fermeture de l'app (« Verrouiller l'admin » dans Réglages).
+  Pour changer le code : SHA-256 de `jeu-2ans:XXXX` dans `CODE_ADMIN_SHA256` (`js/config.js`).
+- **Rôle de chaque iPhone** (admin → Réglages → Cet appareil) :
+  - *Joueuse* (défaut) : reçoit les notifs du jeu, la progression est enregistrée. C'est l'iPhone de Lisa.
+  - *Admin* : ne reçoit que les notifs de test ; l'accueil est en lecture seule (rien n'est écrit à la place de Lisa).
+- L'admin peut **prévisualiser** tout le jeu, étapes non débloquées comprises (bouton « Aperçu »).
 
 ## Structure
 
@@ -67,7 +66,7 @@ Chaque étape :
 | `etapes/{n}` | relais (ou admin en secours) | admin, joueuse |
 | `progression/{n}` | joueuse, si l'étape est ouverte | admin, joueuse |
 | `reponses/{n}` | joueuse, si l'étape est ouverte | admin, joueuse |
-| `abonnes/{uid}` | chaque utilisateur pour lui-même | admin, relais |
+| `appareils/{id}` | chaque iPhone (jeton push + rôle) | admin, relais |
 | `journal/{id}` | relais | admin |
 
 Coût : ~45 lectures à l'ouverture de l'app, puis cache local. Largement dans le plan Spark.
@@ -76,7 +75,7 @@ Coût : ~45 lectures à l'ouverture de l'app, puis cache local. Largement dans l
 
 ```bash
 npm install
-npm run test:regles      # émulateur local, 23 cas
+npm run test:regles      # émulateur local, 26 cas
 ```
 
 Puis publier `firestore.rules` à la main (console Firebase → Firestore → Règles) ou via l'API Firebase Rules.

@@ -1,13 +1,13 @@
 // Tableau de bord admin : suivi des 21 étapes, réponses de Lisa, journal du relais,
 // déblocage manuel (étape 21 et secours), notifications de test, aperçu du jeu.
 import { h, dateParis, dateCourte, toDate } from "./outils.js";
-import { RELAIS_URL, UID_ADMIN } from "./config.js";
+import { RELAIS_URL } from "./config.js";
 import { verrouillerAdmin } from "./code.js";
 import { demarrerJeu } from "./joueuse.js";
 
 export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
   const { db, fs } = fb;
-  const etat = { etapes: {}, prog: {}, reponses: {}, journal: [], abonnes: {} };
+  const etat = { etapes: {}, prog: {}, reponses: {}, journal: [], appareils: {} };
   const desabos = [];
   let onglet = "suivi";
   let sousVue = null; // arrêt de l'aperçu en cours
@@ -20,11 +20,11 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
   suivre(fs.collection(db, "etapes"), "etapes", parId);
   suivre(fs.collection(db, "progression"), "prog", parId);
   suivre(fs.collection(db, "reponses"), "reponses", parId);
-  suivre(fs.collection(db, "abonnes"), "abonnes", parId);
+  suivre(fs.collection(db, "appareils"), "appareils", parId);
   suivre(fs.query(fs.collection(db, "journal"), fs.orderBy("a", "desc"), fs.limit(40)), "journal",
     (s) => s.docs.map((d) => ({ id: d.id, ...d.data() })));
 
-  fb.synchroniserJeton(user.uid).catch(() => {});
+  fb.synchroniserAppareil().catch(() => {});
 
   // ---------- Relais ----------
   async function relais(action, extra = {}) {
@@ -54,7 +54,7 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
 
   async function notifTest(cible) {
     try {
-      const d = await relais("test", { cible });
+      const d = await relais("test", { cible, appareil: fb.idAppareil() });
       toast(d.message || "Notification envoyée");
     } catch (e) { alert(e.message); }
   }
@@ -96,8 +96,7 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
         h("button", { class: "icone-btn", "aria-label": "Retour à l'accueil", onclick: () => retour?.() }, "‹"),
         h("div", { style: "flex:1" }, h("div", { class: "surtitre" }, "Admin"), h("div", { class: "titre-app" }, "Tableau de bord")),
         h("button", { class: "btn secondaire petit", onclick: () => apercu() }, "👁 Aperçu")),
-      user.uid === UID_ADMIN ? null : h("div", { class: "bandeau alerte" },
-        "Ce compte n'a pas les droits admin : le suivi, les réponses et le journal restent masqués."),
+
       h("nav", { class: "onglets" }, tabs.map(([id, nom]) =>
         h("button", { class: onglet === id ? "actif" : "", onclick: () => { onglet = id; rendre(); window.scrollTo(0, 0); } }, nom))),
       contenu));
@@ -162,35 +161,64 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
         j.detail ? h("code", {}, typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail)) : null)));
   }
 
+  async function oublierAppareil(id) {
+    if (!confirm("Retirer cet appareil ? Il ne recevra plus de notifications jusqu'à sa prochaine ouverture de l'app.")) return;
+    await fs.deleteDoc(fs.doc(db, "appareils", id)).catch((e) => alert(e.message));
+  }
+
   function vueReglages() {
-    const abos = Object.entries(etat.abonnes);
-    const permission = fb.pushPossible() ? Notification.permission : "indisponible";
+    const ici = fb.idAppareil();
+    const role = fb.roleAppareil();
+    const appareils = Object.entries(etat.appareils)
+      .sort(([a], [b]) => (a === ici ? -1 : b === ici ? 1 : 0));
+    const permission = fb.pushPossible() ? { granted: "autorisées", denied: "refusées", default: "pas encore demandées" }[Notification.permission] : "indisponibles";
     const btnPerm = h("button", { class: "btn secondaire plein" }, "Activer les notifications sur cet appareil");
     btnPerm.addEventListener("click", async () => {
       const p = await Notification.requestPermission();
-      if (p === "granted") { await fb.synchroniserJeton(user.uid).catch((e) => alert(e.message)); toast("Appareil inscrit"); }
+      if (p === "granted") { await fb.synchroniserAppareil(true).catch((e) => alert(e.message)); toast("Appareil inscrit"); }
       rendre();
     });
+
+    const choixRole = h("div", { class: "onglets", style: "position:static" },
+      [["joueuse", "Joueuse"], ["admin", "Admin"]].map(([v, nom]) => h("button", {
+        class: role === v ? "actif" : "",
+        onclick: async () => {
+          if (v === role) return;
+          await fb.changerRoleAppareil(v).catch((e) => alert(e.message));
+          toast(v === "admin" ? "Cet appareil est maintenant « admin »" : "Cet appareil est maintenant « joueuse »");
+          rendre();
+        },
+      }, nom)));
+
     return h("div", { class: "pile" },
       h("section", { class: "carte pile" },
+        h("h3", {}, "Cet appareil"),
+        choixRole,
+        h("p", { class: "doux" }, role === "admin"
+          ? "Admin : ne reçoit que les notifs de test, et l'accueil est en lecture seule (rien n'est enregistré à la place de Lisa)."
+          : "Joueuse : reçoit les notifs du jeu, et sa progression est enregistrée. C'est le réglage de l'iPhone de Lisa."),
+        h("p", { class: "discret" }, `Notifications ${permission}${fb.estInstallee() ? " · app installée" : " · ouvert dans le navigateur"}`),
+        permission === "pas encore demandées" ? btnPerm : null),
+      h("section", { class: "carte pile" },
         h("h3", {}, "Appareils inscrits"),
-        abos.length ? abos.map(([uid, a]) => h("div", { class: "journal-ligne" },
-          h("strong", {}, uid === user.uid ? "Moi (admin)" : "Joueuse"),
-          h("div", { class: "discret" }, `màj ${dateCourte(toDate(a.majA))}`),
-          h("code", {}, (a.appareil || "").slice(0, 90)))) : h("p", { class: "doux" }, "Aucun appareil inscrit."),
-        h("p", { class: "discret" }, `Cet appareil : notifications ${permission}${fb.estInstallee() ? " · app installée" : " · ouvert dans le navigateur"}`),
-        permission === "default" ? btnPerm : null),
+        appareils.length ? appareils.map(([id, a]) => h("div", { class: "journal-ligne" },
+          h("div", { class: "ligne" },
+            h("strong", {}, `${a.role === "admin" ? "Admin" : "Joueuse"}${id === ici ? " · cet appareil" : ""}`),
+            h("span", { class: "espace" }),
+            h("button", { class: "btn fantome petit", onclick: () => oublierAppareil(id) }, "Retirer")),
+          h("div", { class: "discret" }, `màj ${dateCourte(toDate(a.majA))}${a.jeton ? "" : " · pas de notifications"}`),
+          h("code", {}, (a.appareil || "").slice(0, 90)))) : h("p", { class: "doux" }, "Aucun appareil inscrit.")),
       h("section", { class: "carte pile" },
         h("h3", {}, "Notifications de test"),
         h("p", { class: "doux" }, "Passe par le relais Apps Script, comme les vraies."),
-        h("button", { class: "btn secondaire plein", onclick: () => notifTest("admin") }, "M'envoyer une notif de test"),
-        h("button", { class: "btn secondaire plein", onclick: () => notifTest("joueuse") }, "Envoyer une notif de test à la joueuse")),
+        h("button", { class: "btn secondaire plein", onclick: () => notifTest("appareil") }, "Tester sur cet appareil"),
+        h("button", { class: "btn secondaire plein", onclick: () => notifTest("joueuse") }, "Tester sur les appareils « joueuse »")),
       h("section", { class: "carte pile" },
         h("h3", {}, "Tests"),
         h("p", { class: "doux" }, "Avant le lancement : remet le jeu à zéro (étapes, progression, réponses)."),
         h("button", { class: "btn danger plein", onclick: reinitialiser }, "Remettre le jeu à zéro")),
       h("section", { class: "carte pile" },
-        h("p", { class: "discret" }, `Connecté : ${user.email}`),
+        h("p", { class: "discret" }, `Compte : ${user.email}`),
         h("button", { class: "btn secondaire plein", onclick: () => { verrouillerAdmin(); retour?.(); } }, "Verrouiller l'admin"),
         h("button", { class: "btn fantome", onclick: () => { if (confirm("Se déconnecter de cet appareil ?")) { verrouillerAdmin(); fb.deconnexion(); } } }, "Se déconnecter")));
   }

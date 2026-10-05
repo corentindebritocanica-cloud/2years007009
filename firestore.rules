@@ -4,71 +4,73 @@ rules_version = '2';
 // ⚠️ Fichier versionné mais PAS déployé automatiquement : le publier depuis la
 // console Firebase (Firestore → Règles) ou via l'API Firebase Rules après test.
 //
+// Modèle : UN SEUL compte e-mail + mot de passe, partagé par Lisa et Corentin.
+// L'accès à l'écran admin est filtré par le code à 4 chiffres côté app ;
+// ici, on garantit que seul ce compte accède aux données, et que le jeu
+// ne peut pas être rempli en avance (une étape n'est écrivable qu'une fois ouverte).
 // Le relais Apps Script écrit avec le compte de service : il passe outre ces règles.
 // Fermé par défaut : tout ce qui n'est pas explicitement ouvert est refusé.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ---------- Rôles ----------
-    function connecte() { return request.auth != null; }
-    function admin()    { return connecte() && request.auth.uid == 'wg2JcW2kfkTGr1AB7ROEubZtL9h1'; }
-    function joueuse()  { return connecte() && request.auth.uid == 'UID_JOUEUSE_A_RENSEIGNER'; }
-    function membre()   { return admin() || joueuse(); }
+    function compte() { return request.auth != null && request.auth.uid == 'wg2JcW2kfkTGr1AB7ROEubZtL9h1'; }
 
-    // Une étape n'existe dans Firestore qu'une fois débloquée par le relais (heure serveur).
+    // Une étape n'existe dans Firestore qu'une fois débloquée (heure serveur du relais).
     function ouverte(n) { return exists(/databases/$(database)/documents/etapes/$(n)); }
     function numeroValide(n) { return n.matches('^([1-9]|1[0-9]|2[01])$'); }
 
     // ---------- etapes/{n} : état de déblocage ----------
     match /etapes/{n} {
-      allow read: if membre();
-      // Déblocage manuel de secours par l'admin uniquement (le relais fait le reste).
-      allow create: if admin() && numeroValide(n)
+      allow read: if compte();
+      // Déblocage manuel de secours depuis l'admin (le relais fait le reste).
+      allow create: if compte() && numeroValide(n)
         && request.resource.data.keys().hasOnly(['debloqueeA', 'mode'])
+        && request.resource.data.mode == 'manuel'
         && request.resource.data.debloqueeA == request.time;
-      allow delete: if admin();
+      allow delete: if compte();
       allow update: if false;
     }
 
-    // ---------- progression/{n} : avancement de la joueuse ----------
+    // ---------- progression/{n} : avancement de Lisa ----------
     match /progression/{n} {
-      allow read: if membre();
-      allow create, update: if joueuse() && numeroValide(n) && ouverte(n)
+      allow read: if compte();
+      allow create, update: if compte() && numeroValide(n) && ouverte(n)
         && request.resource.data.keys().hasOnly(['questionOK', 'jeuOK', 'termineeA', 'tentatives'])
         && (!('questionOK' in request.resource.data) || request.resource.data.questionOK is bool)
         && (!('jeuOK' in request.resource.data) || request.resource.data.jeuOK is bool)
         && (!('tentatives' in request.resource.data) || (request.resource.data.tentatives is int && request.resource.data.tentatives < 10000))
         && (!('termineeA' in request.resource.data) || request.resource.data.termineeA is timestamp);
-      allow delete: if admin();
+      allow delete: if compte();
     }
 
     // ---------- reponses/{n} : réponses aux questions profondes ----------
     match /reponses/{n} {
-      allow read: if membre();
-      allow create, update: if joueuse() && numeroValide(n) && ouverte(n)
+      allow read: if compte();
+      allow create, update: if compte() && numeroValide(n) && ouverte(n)
         && request.resource.data.keys().hasOnly(['texte', 'ecritA'])
         && request.resource.data.texte is string
         && request.resource.data.texte.size() > 0
         && request.resource.data.texte.size() <= 5000
         && request.resource.data.ecritA == request.time;
-      allow delete: if admin();
+      allow delete: if compte();
     }
 
-    // ---------- abonnes/{uid} : jeton push de chaque appareil ----------
-    match /abonnes/{uid} {
-      allow read: if admin() || (connecte() && request.auth.uid == uid);
-      allow create, update: if membre() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['jeton', 'majA', 'appareil'])
+    // ---------- appareils/{id} : jeton push + rôle de chaque iPhone ----------
+    match /appareils/{id} {
+      allow read, delete: if compte();
+      allow create, update: if compte()
+        && id.size() >= 8 && id.size() <= 64
+        && request.resource.data.keys().hasOnly(['jeton', 'role', 'majA', 'appareil'])
         && request.resource.data.jeton is string
         && request.resource.data.jeton.size() < 4096
+        && request.resource.data.role in ['joueuse', 'admin']
         && request.resource.data.majA == request.time;
-      allow delete: if admin() || (connecte() && request.auth.uid == uid);
     }
 
     // ---------- journal/{id} : écrit uniquement par le relais ----------
     match /journal/{id} {
-      allow read: if admin();
+      allow read: if compte();
       allow write: if false;
     }
 

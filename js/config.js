@@ -13,13 +13,13 @@ export const FIREBASE = {
 // Version du SDK Firebase servie par le CDN gstatic.
 export const SDK = "https://www.gstatic.com/firebasejs/12.19.0";
 
-// UID du compte admin (Corentin). Doit correspondre à firestore.rules.
-export const UID_ADMIN = "wg2JcW2kfkTGr1AB7ROEubZtL9h1";
+// UID du compte unique partagé (Lisa et Corentin se connectent avec le même
+// e-mail + mot de passe). Doit correspondre à firestore.rules et relais/Code.gs.
+export const UID_COMPTE = "wg2JcW2kfkTGr1AB7ROEubZtL9h1";
 
 // Code à 4 chiffres qui ouvre l'espace admin depuis le logo de l'accueil.
 // Stocké en empreinte SHA-256 (sel "jeu-2ans:") pour ne pas apparaître en clair.
-// Ce code ne protège que l'écran : les données admin restent protégées par
-// firestore.rules (seul le compte admin peut les lire).
+// C'est la seule barrière entre l'accueil et l'admin (compte unique partagé).
 export const CODE_ADMIN_SHA256 = "3e19fbca585162609ed70502d09ab5681fb7e4909936bf30f55e0558a04c0c2d";
 
 // URL « …/exec » du relais Apps Script, à coller après son déploiement.

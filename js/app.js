@@ -1,7 +1,6 @@
 // Point d'entrée : connexion unique et persistante, puis routage selon le rôle
 // (joueuse → le jeu, admin → le tableau de bord, qui peut aussi prévisualiser le jeu).
 import { h, estIOS, tutoInstallation } from "./outils.js";
-import { UID_ADMIN } from "./config.js";
 
 const racine = document.getElementById("app");
 const chargement = () => racine.replaceChildren(h("div", { class: "chargement" }, h("div", { class: "point" })));
@@ -42,8 +41,8 @@ fb.surAuth(async (user) => {
     arreterVue();
     arreterVue = demarrerJeu(racine, fb, jeu, user, {
       apercu: false,
-      // Le compte admin voit l'état réel du jeu mais n'écrit jamais la progression de Lisa.
-      lectureSeule: user.uid === UID_ADMIN,
+      // Un appareil marqué « admin » voit l'état réel du jeu sans jamais écrire la progression.
+      lectureSeule: fb.roleAppareil() === "admin",
       ouvrirAdmin: admin,
     });
   };

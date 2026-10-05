@@ -30,7 +30,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       etat.prog = Object.fromEntries(s.docs.map((d) => [Number(d.id), d.data()]));
       etat.pret.p = true; surDonnees();
     }, erreurDonnees));
-    fb.synchroniserJeton(user.uid).catch(() => {});
+    fb.synchroniserAppareil().catch(() => {});
   }
 
   function erreurDonnees(e) {
@@ -168,7 +168,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       if (await demanderCode()) ouvrirAdmin();
     });
     return h("footer", { class: "pied" }, logo,
-      lectureSeule ? h("p", { class: "discret" }, "Vue de Lisa · tes actions ici ne sont pas enregistrées") : null);
+      lectureSeule ? h("p", { class: "discret" }, "Appareil admin · tes actions ici ne sont pas enregistrées") : null);
   }
 
   function carteNotifications() {
@@ -186,7 +186,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       btn.disabled = true;
       const p = await Notification.requestPermission();
       if (p === "granted") {
-        try { await fb.synchroniserJeton(user.uid); rendre(); }
+        try { await fb.synchroniserAppareil(true); rendre(); }
         catch (e) { console.error(e); btn.disabled = false; msg.className = "message erreur"; msg.textContent = "Échec de l'inscription, réessaie."; }
       } else rendre();
     });

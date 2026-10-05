@@ -17,8 +17,7 @@
 var CONFIG = {
   PROJET: 'years-b3e18',
   API_KEY: 'AIzaSyD65D8kOjDkDY6pCZkyQ1f6Md40NORhGHA',     // clé web publique (vérif. des jetons)
-  UID_ADMIN: 'wg2JcW2kfkTGr1AB7ROEubZtL9h1',
-  UID_JOUEUSE: 'UID_JOUEUSE_A_RENSEIGNER',
+  UID_COMPTE: 'wg2JcW2kfkTGr1AB7ROEubZtL9h1',            // compte unique partagé (Lisa + Corentin)
   EMAIL_ADMIN: 'corentin.debritocanica@gmail.com',
   EMAIL_JOUEUSE: '',                                       // e-mail de repli si la notif échoue
   URL_APP: 'https://corentindebritocanica-cloud.github.io/2years007009/',
@@ -59,7 +58,7 @@ function tick() {
       var p = lireDoc_('progression/' + k);
       if (p && p.termineeA) { patcher_('etapes/' + k, { relanceSautee: true }); return; }
       var meta = meta_();
-      var r = envoyerPush_(CONFIG.UID_JOUEUSE, {
+      var r = envoyerPush_('joueuse', {
         titre: meta.relanceTitre || "Tu n'as pas oublié ?",
         texte: meta.relanceTexte || 'Ton étape t\'attend toujours 💛',
         etape: String(k)
@@ -83,7 +82,7 @@ function debloquer_(n, mode, notifier) {
   if (notifier === false) return { ok: true };
 
   var meta = meta_();
-  var r = envoyerPush_(CONFIG.UID_JOUEUSE, {
+  var r = envoyerPush_('joueuse', {
     titre: meta.titre || 'Une nouvelle étape t\'attend',
     texte: meta.texte || 'Ouvre l\'app quand tu es prête ✨',
     etape: String(n)
@@ -108,7 +107,7 @@ function doPost(e) {
   try {
     var corps = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     var uid = verifierJeton_(corps.idToken);
-    if (uid !== CONFIG.UID_ADMIN) return json_({ ok: false, erreur: 'Accès refusé' });
+    if (uid !== CONFIG.UID_COMPTE) return json_({ ok: false, erreur: 'Accès refusé' });
 
     if (corps.action === 'debloquer') {
       var n = Number(corps.etape);
@@ -119,9 +118,9 @@ function doPost(e) {
     }
 
     if (corps.action === 'test') {
-      var cible = corps.cible === 'joueuse' ? CONFIG.UID_JOUEUSE : CONFIG.UID_ADMIN;
+      var cible = corps.cible === 'joueuse' ? 'joueuse' : { appareil: String(corps.appareil || '') };
       var t = envoyerPush_(cible, { titre: 'Notification de test', texte: 'Si tu lis ça, tout fonctionne 🎉', etape: '' });
-      journal_(t.ok ? 'test' : 'test_erreur', null, (corps.cible || 'admin') + (t.ok ? '' : ' : ' + t.erreur));
+      journal_(t.ok ? 'test' : 'test_erreur', null, (corps.cible || 'appareil') + (t.ok ? ' (' + t.envoyes + ' appareil(s))' : ' : ' + t.erreur));
       return json_(t.ok ? { ok: true, message: 'Notification envoyée' } : { ok: false, erreur: t.erreur });
     }
 
@@ -148,12 +147,35 @@ function verifierJeton_(idToken) {
 }
 
 // ===================================================================== FCM
-function envoyerPush_(uid, data) {
-  var abo = lireDoc_('abonnes/' + uid);
-  if (!abo || !abo.jeton) return { ok: false, erreur: 'AUCUN_JETON' };
+// cible : 'joueuse' (tous les appareils joueuse), 'admin', ou { appareil: id }.
+// Un jeton révoqué par iOS (UNREGISTERED / NOT_FOUND) est retiré de Firestore.
+function envoyerPush_(cible, data) {
+  var appareils = listerAppareils_().filter(function (a) {
+    if (!a.jeton) return false;
+    if (cible && cible.appareil) return a.id === cible.appareil;
+    return a.role === cible;
+  });
+  var vus = {};
+  appareils = appareils.filter(function (a) { if (vus[a.jeton]) return false; vus[a.jeton] = true; return true; });
+  if (!appareils.length) return { ok: false, erreur: 'AUCUN_APPAREIL', envoyes: 0 };
+
+  var envoyes = 0, erreurs = [];
+  appareils.forEach(function (a) {
+    var r = envoyerFcm_(a.jeton, data);
+    if (r.ok) { envoyes++; return; }
+    erreurs.push(r.erreur);
+    if (r.erreur === 'UNREGISTERED' || r.erreur === 'NOT_FOUND') {
+      fs_('delete', 'appareils/' + a.id);
+      journal_('appareil_retire', null, a.id + ' : ' + r.erreur);
+    }
+  });
+  return envoyes ? { ok: true, envoyes: envoyes } : { ok: false, erreur: erreurs.join(', '), envoyes: 0 };
+}
+
+function envoyerFcm_(jeton, data) {
   var message = {
     message: {
-      token: abo.jeton,
+      token: jeton,
       // Données uniquement : sw.js affiche lui-même la notification (règle iOS).
       data: { titre: String(data.titre), texte: String(data.texte), etape: String(data.etape || '') },
       webpush: { headers: { Urgency: 'high', TTL: '86400' } }
@@ -170,7 +192,7 @@ function envoyerPush_(uid, data) {
   try {
     var err = JSON.parse(r.getContentText()).error;
     statut = (err.details || []).map(function (d) { return d.errorCode; }).filter(String)[0] || err.status || '';
-  } catch (_) { statut = 'HTTP_' + code; }
+  } catch (_) { statut = ''; }
   return { ok: false, erreur: statut || ('HTTP_' + code) };
 }
 
@@ -242,6 +264,16 @@ function fs_(methode, chemin, corps) {
   if (corps) opts.payload = JSON.stringify(corps);
   var r = UrlFetchApp.fetch(base_() + chemin, opts);
   return { code: r.getResponseCode(), data: r.getContentText() ? JSON.parse(r.getContentText()) : {} };
+}
+
+function listerAppareils_() {
+  var r = fs_('get', 'appareils?pageSize=50');
+  if (r.code !== 200) throw new Error('Liste appareils : ' + r.code);
+  return (r.data.documents || []).map(function (d) {
+    var o = decoder_(d.fields || {});
+    o.id = d.name.split('/').pop();
+    return o;
+  });
 }
 
 function lireDoc_(chemin) {
@@ -352,15 +384,16 @@ function installer() {
 function testerConnexion() {
   Logger.log('Jeton Google OK : ' + !!jetonGoogle_());
   Logger.log('Étapes ouvertes : ' + JSON.stringify(Object.keys(listerEtapes_())));
+  Logger.log('Appareils : ' + JSON.stringify(listerAppareils_().map(function (a) { return a.id.slice(0, 6) + ' ' + a.role + (a.jeton ? '' : ' (sans jeton)'); })));
   Logger.log('Calendrier (3 premières) : ' + JSON.stringify(calendrier_().slice(0, 3)));
 }
 
 function testerNotifAdmin() {
-  Logger.log(JSON.stringify(envoyerPush_(CONFIG.UID_ADMIN, { titre: 'Test relais', texte: 'Envoyé depuis Apps Script ✅', etape: '' })));
+  Logger.log(JSON.stringify(envoyerPush_('admin', { titre: 'Test relais', texte: 'Envoyé depuis Apps Script ✅', etape: '' })));
 }
 
 function testerNotifJoueuse() {
-  Logger.log(JSON.stringify(envoyerPush_(CONFIG.UID_JOUEUSE, { titre: 'Test', texte: 'Notification de test 💛', etape: '' })));
+  Logger.log(JSON.stringify(envoyerPush_('joueuse', { titre: 'Test', texte: 'Notification de test 💛', etape: '' })));
 }
 
 function viderCacheJeu() {

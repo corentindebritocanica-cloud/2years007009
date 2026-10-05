@@ -61,19 +61,51 @@ export async function obtenirJeton(reg) {
   return msg.getToken(messaging, opts);
 }
 
-// Enregistre / rafraîchit le jeton dans abonnes/{uid}. À chaque ouverture,
-// car iOS peut changer le jeton sans prévenir. Écrit seulement s'il a changé.
-export async function synchroniserJeton(uid) {
-  if (!pushPossible() || Notification.permission !== "granted") return null;
-  const reg = await enregistrerSW();
-  await navigator.serviceWorker.ready;
-  const jeton = await obtenirJeton(reg);
-  if (!jeton) return null;
-  const ref = fs.doc(db, "abonnes", uid);
+// ---------- Appareils ----------
+// Le compte est partagé : chaque iPhone a son propre identifiant et son propre
+// document appareils/{id}, avec un rôle. Les notifs du jeu partent vers les
+// appareils « joueuse » ; un appareil « admin » ne reçoit que les tests et
+// n'écrit jamais la progression.
+const CLE_ID = "appareil-id";
+const CLE_ROLE = "appareil-role";
+
+export function idAppareil() {
+  let id = null;
+  try { id = localStorage.getItem(CLE_ID); } catch { /* stockage indisponible */ }
+  if (!id) {
+    id = (crypto.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2)).replace(/-/g, "");
+    try { localStorage.setItem(CLE_ID, id); } catch { /* sans effet */ }
+  }
+  return id;
+}
+
+export function roleAppareil() {
+  try { return localStorage.getItem(CLE_ROLE) === "admin" ? "admin" : "joueuse"; } catch { return "joueuse"; }
+}
+
+export async function changerRoleAppareil(role) {
+  try { localStorage.setItem(CLE_ROLE, role === "admin" ? "admin" : "joueuse"); } catch { /* sans effet */ }
+  await synchroniserAppareil(true);
+}
+
+// À chaque ouverture : iOS peut changer le jeton sans prévenir.
+// N'écrit que si le jeton ou le rôle a changé (une écriture max par ouverture).
+export async function synchroniserAppareil(forcer = false) {
+  const ref = fs.doc(db, "appareils", idAppareil());
+  let jeton = null;
+  if (pushPossible() && Notification.permission === "granted") {
+    const reg = await enregistrerSW();
+    await navigator.serviceWorker.ready;
+    jeton = await obtenirJeton(reg);
+  }
   const snap = await fs.getDoc(ref).catch(() => null);
-  if (!snap || !snap.exists() || snap.data().jeton !== jeton) {
+  const avant = snap?.exists() ? snap.data() : null;
+  const role = roleAppareil();
+  if (!jeton && !avant && !forcer) return null;
+  if (forcer || !avant || avant.jeton !== (jeton || avant.jeton) || avant.role !== role) {
     await fs.setDoc(ref, {
-      jeton,
+      jeton: jeton || avant?.jeton || "",
+      role,
       majA: fs.serverTimestamp(),
       appareil: navigator.userAgent.slice(0, 180),
     });
