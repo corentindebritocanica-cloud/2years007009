@@ -145,9 +145,30 @@
         "texte": "Qui a dit « je t'aime » en premier ?",
         "reponses": [
           "Lisa",
-          "moi"
+          "moi",
+          "c'est moi",
+          "c'est Lisa"
         ],
-        "indice": ""
+        "indice": "",
+        "pieges": [
+          {
+            "reponses": [
+              "corentin",
+              "toi",
+              "c'est toi",
+              "lui",
+              "coco",
+              "co",
+              "corentin de brito",
+              "mon copain",
+              "mon chéri"
+            ],
+            "tampon": "RATÉ",
+            "titre": "Raté, Madame !",
+            "message": "On veut savoir qui l'a *DIT*… pas qui l'a *ÉCRIT* 😏",
+            "bouton": "Bon… je réessaie"
+          }
+        ]
       },
       "jeu": {
         "type": "memoire",

@@ -347,6 +347,35 @@ label.etiquette { font-size: 0.85rem; color: var(--texte-2); font-weight: 600; }
 .pin-touche:active { transform: scale(0.92); background: color-mix(in srgb, var(--ambre) 25%, var(--surface-2)); }
 .pin-touche.effacer { background: transparent; border-color: transparent; font-size: 1.4rem; color: var(--texte-2); }
 
+/* ---------- Réponse piège : tampon « RATÉ » ---------- */
+.rate-voile {
+  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;
+  padding: calc(var(--st) + 20px) calc(var(--sr) + 20px) calc(var(--sb) + 20px) calc(var(--sl) + 20px);
+  background: rgba(10, 6, 12, 0.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; transition: opacity 0.2s;
+}
+.rate-voile.visible { opacity: 1; }
+.rate-boite {
+  width: 100%; max-width: 380px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px;
+  background: var(--surface); border: 1px solid var(--trait); border-radius: var(--rayon); padding: 34px 22px 22px; box-shadow: var(--ombre);
+}
+.rate-voile.visible .rate-boite { animation: rate-secousse 0.5s 0.45s; }
+.rate-tampon {
+  font-family: var(--display); font-weight: 600; font-size: 3.2rem; letter-spacing: 0.08em; line-height: 1;
+  color: var(--rouge); border: 5px solid var(--rouge); border-radius: 10px; padding: 6px 18px;
+  transform: rotate(-12deg) scale(3); opacity: 0;
+}
+.rate-voile.visible .rate-tampon { animation: rate-tampon 0.45s cubic-bezier(.2,1.6,.4,1) forwards; }
+.rate-titre { font-size: 1.6rem; margin-top: 10px; }
+.rate-message { font-size: 1.08rem; color: var(--texte-2); line-height: 1.5; }
+.rate-message strong { color: var(--texte); font-size: 1.25em; letter-spacing: 0.04em; text-decoration: underline; text-decoration-color: var(--rouge); text-underline-offset: 4px; }
+@keyframes rate-tampon {
+  0% { transform: rotate(-12deg) scale(3); opacity: 0; }
+  70% { transform: rotate(-12deg) scale(0.92); opacity: 1; }
+  100% { transform: rotate(-12deg) scale(1); opacity: 1; }
+}
+@keyframes rate-secousse { 15%, 55% { transform: translateX(-10px) rotate(-1deg); } 35%, 75% { transform: translateX(10px) rotate(1deg); } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

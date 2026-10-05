@@ -255,6 +255,14 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
           return rendre();
         }
         ecrireProgression(n, { tentatives: essais }).catch(() => {});
+        // Réponse « piège » prévue à l'avance : animation dédiée.
+        const piege = (q.pieges || []).find((p) => reponseCorrecte(val, p.reponses));
+        if (piege) {
+          await animationRate(piege);
+          btn.disabled = false; champ.value = ""; msg.textContent = "";
+          champ.focus({ preventScroll: true });
+          return;
+        }
         btn.disabled = false;
         msg.className = "message erreur";
         msg.textContent = essais >= 3 && q.indice ? `Indice : ${q.indice}` : "Ce n'est pas ça… réessaie.";
@@ -264,6 +272,31 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
         btn.disabled = false;
         msg.className = "message erreur"; msg.textContent = "Enregistrement impossible. Vérifie ton réseau et réessaie.";
       }
+    });
+  }
+
+  // Grand tampon « RATÉ » plein écran. Les mots entre *astérisques* sont mis en valeur.
+  function animationRate(piege) {
+    return new Promise((fini) => {
+      const message = h("p", { class: "rate-message" });
+      String(piege.message || "").split(/(\*[^*]+\*)/).forEach((bout) => {
+        if (/^\*[^*]+\*$/.test(bout)) message.append(h("strong", {}, bout.slice(1, -1)));
+        else if (bout) message.append(bout);
+      });
+      const bouton = h("button", { class: "btn plein" }, piege.bouton || "Je réessaie");
+      const voile = h("div", { class: "rate-voile", role: "alertdialog", "aria-live": "assertive" },
+        h("div", { class: "rate-boite" },
+          h("div", { class: "rate-tampon" }, piege.tampon || "RATÉ"),
+          h("h2", { class: "rate-titre" }, piege.titre || "Raté !"),
+          message,
+          bouton));
+      document.body.append(voile);
+      try { navigator.vibrate?.([60, 40, 60, 40, 160]); } catch { /* iOS : sans effet */ }
+      requestAnimationFrame(() => voile.classList.add("visible"));
+      bouton.addEventListener("click", () => {
+        voile.classList.remove("visible");
+        setTimeout(() => { voile.remove(); fini(); }, 250);
+      });
     });
   }
 

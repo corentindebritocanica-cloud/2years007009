@@ -47,6 +47,7 @@ Chaque étape :
 }
 ```
 
+- `question.pieges[]` (optionnel) : `{reponses, tampon, titre, message, bouton}` — une réponse fausse prévue déclenche un tampon « RATÉ » plein écran ; `*mot*` = mis en valeur dans le message.
 - `question.type` : `verifiable` (comparée sans accents/majuscules/articles) ou `profonde` (toute réponse, enregistrée pour l'admin ; `motApres` optionnel).
 - Mini-jeux et paramètres :
   - `grattage` : `cache`
