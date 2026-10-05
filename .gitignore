@@ -1,0 +1,6 @@
+node_modules/
+*.log
+.DS_Store
+# Jamais de clé de compte de service dans le dépôt
+*service-account*.json
+sa.json

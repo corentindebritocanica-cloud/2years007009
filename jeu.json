@@ -1,0 +1,642 @@
+{
+  "meta": {
+    "prenom": "Lisa",
+    "nomJeu": "Notre jeu",
+    "accueil": "Texte d'accueil du 12 octobre — À REMPLIR",
+    "signature": "Corentin",
+    "notif": {
+      "titre": "Une nouvelle étape t'attend",
+      "texte": "Ouvre l'app quand tu es prête ✨",
+      "relanceTitre": "Tu n'as pas oublié ?",
+      "relanceTexte": "Ton étape t'attend toujours 💛"
+    }
+  },
+  "etapes": [
+    {
+      "n": 1,
+      "phase": "Nous",
+      "titre": "Étape 1",
+      "date": "2026-10-12",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 1 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "grattage",
+        "consigne": "Gratte pour découvrir",
+        "cache": "Un message t'attend…"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 2,
+      "phase": "Nous",
+      "titre": "Étape 2",
+      "date": "2026-10-15",
+      "heure": "23:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 2 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "memoire",
+        "consigne": "Retrouve les paires",
+        "photos": [
+          {
+            "image": "img/jeu/photo-01.svg",
+            "legende": "Date 1 — À REMPLIR"
+          },
+          {
+            "image": "img/jeu/photo-02.svg",
+            "legende": "Date 2 — À REMPLIR"
+          },
+          {
+            "image": "img/jeu/photo-03.svg",
+            "legende": "Date 3 — À REMPLIR"
+          },
+          {
+            "image": "img/jeu/photo-04.svg",
+            "legende": "Date 4 — À REMPLIR"
+          },
+          {
+            "image": "img/jeu/photo-05.svg",
+            "legende": "Date 5 — À REMPLIR"
+          }
+        ]
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 3,
+      "phase": "Nous",
+      "titre": "Étape 3",
+      "date": "2026-10-18",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 3 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "puzzle",
+        "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
+        "image": "img/jeu/puzzle-1.svg",
+        "taille": 3
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 4,
+      "phase": "Nous",
+      "titre": "Étape 4",
+      "date": "2026-10-21",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 4 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "grattage",
+        "consigne": "Gratte pour découvrir",
+        "cache": "Un message t'attend…"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 5,
+      "phase": "Nous",
+      "titre": "Étape 5",
+      "date": "2026-10-24",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 5 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "memoire",
+        "consigne": "Retrouve les paires",
+        "photos": [
+          {
+            "image": "img/jeu/photo-06.svg",
+            "legende": "Date 1 — À REMPLIR"
+          },
+          {
+            "image": "img/jeu/photo-07.svg",
+            "legende": "Date 2 — À REMPLIR"
+          },
+          {
+            "image": "img/jeu/photo-08.svg",
+            "legende": "Date 3 — À REMPLIR"
+          },
+          {
+            "image": "img/jeu/photo-09.svg",
+            "legende": "Date 4 — À REMPLIR"
+          },
+          {
+            "image": "img/jeu/photo-10.svg",
+            "legende": "Date 5 — À REMPLIR"
+          }
+        ]
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 6,
+      "phase": "Nous",
+      "titre": "Étape 6",
+      "date": "2026-10-27",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 6 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "puzzle",
+        "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
+        "image": "img/jeu/puzzle-2.svg",
+        "taille": 3
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 7,
+      "phase": "Nous",
+      "titre": "Étape 7",
+      "date": "2026-10-30",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 7 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "grattage",
+        "consigne": "Gratte pour découvrir",
+        "cache": "Un message t'attend…"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 8,
+      "phase": "Le voyage",
+      "titre": "Étape 8",
+      "date": "2026-11-02",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 8 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "grattage",
+        "consigne": "Gratte pour découvrir",
+        "cache": "Un message t'attend…"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 9,
+      "phase": "Le voyage",
+      "titre": "Étape 9",
+      "date": "2026-11-05",
+      "heure": "23:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 9 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "colis",
+        "consigne": "Quelque chose est arrivé pour toi…",
+        "indice": "Va voir … (À REMPLIR : où est caché le colis)"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 10,
+      "phase": "Le voyage",
+      "titre": "Étape 10",
+      "date": "2026-11-08",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 10 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "cadenas",
+        "consigne": "Fais tourner la molette",
+        "position": 1,
+        "code": "0000",
+        "final": false
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 11,
+      "phase": "Le voyage",
+      "titre": "Étape 11",
+      "date": "2026-11-11",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 11 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "choix",
+        "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
+        "indice": "Indice pour éliminer — À REMPLIR",
+        "options": [
+          {
+            "id": "l1",
+            "nom": "Leurre 1 (À REMPLIR)",
+            "image": "img/jeu/leurre-1.svg"
+          },
+          {
+            "id": "l2",
+            "nom": "Leurre 2 (À REMPLIR)",
+            "image": "img/jeu/leurre-2.svg"
+          },
+          {
+            "id": "l3",
+            "nom": "Leurre 3 (À REMPLIR)",
+            "image": "img/jeu/leurre-3.svg"
+          },
+          {
+            "id": "l4",
+            "nom": "Leurre 4 (À REMPLIR)",
+            "image": "img/jeu/leurre-4.svg"
+          }
+        ],
+        "elimine": "l1",
+        "dejaElimines": []
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 12,
+      "phase": "Le voyage",
+      "titre": "Étape 12",
+      "date": "2026-11-14",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 12 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "cadenas",
+        "consigne": "Fais tourner la molette",
+        "position": 2,
+        "code": "0000",
+        "final": false
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 13,
+      "phase": "Le voyage",
+      "titre": "Étape 13",
+      "date": "2026-11-17",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 13 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "choix",
+        "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
+        "indice": "Indice pour éliminer — À REMPLIR",
+        "options": [
+          {
+            "id": "l1",
+            "nom": "Leurre 1 (À REMPLIR)",
+            "image": "img/jeu/leurre-1.svg"
+          },
+          {
+            "id": "l2",
+            "nom": "Leurre 2 (À REMPLIR)",
+            "image": "img/jeu/leurre-2.svg"
+          },
+          {
+            "id": "l3",
+            "nom": "Leurre 3 (À REMPLIR)",
+            "image": "img/jeu/leurre-3.svg"
+          },
+          {
+            "id": "l4",
+            "nom": "Leurre 4 (À REMPLIR)",
+            "image": "img/jeu/leurre-4.svg"
+          }
+        ],
+        "elimine": "l2",
+        "dejaElimines": [
+          "l1"
+        ]
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 14,
+      "phase": "Le voyage",
+      "titre": "Étape 14",
+      "date": "2026-11-20",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 14 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "cadenas",
+        "consigne": "Fais tourner la molette",
+        "position": 3,
+        "code": "0000",
+        "final": false
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 15,
+      "phase": "La destination",
+      "titre": "Étape 15",
+      "date": "2026-11-23",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 15 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "carte",
+        "consigne": "Maintiens ton doigt pour faire la mise au point",
+        "image": "img/jeu/carte-1.svg"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 16,
+      "phase": "La destination",
+      "titre": "Étape 16",
+      "date": "2026-11-26",
+      "heure": "23:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 16 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "choix",
+        "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
+        "indice": "Indice pour éliminer — À REMPLIR",
+        "options": [
+          {
+            "id": "l1",
+            "nom": "Leurre 1 (À REMPLIR)",
+            "image": "img/jeu/leurre-1.svg"
+          },
+          {
+            "id": "l2",
+            "nom": "Leurre 2 (À REMPLIR)",
+            "image": "img/jeu/leurre-2.svg"
+          },
+          {
+            "id": "l3",
+            "nom": "Leurre 3 (À REMPLIR)",
+            "image": "img/jeu/leurre-3.svg"
+          },
+          {
+            "id": "l4",
+            "nom": "Leurre 4 (À REMPLIR)",
+            "image": "img/jeu/leurre-4.svg"
+          }
+        ],
+        "elimine": "l3",
+        "dejaElimines": [
+          "l1",
+          "l2"
+        ]
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 17,
+      "phase": "La destination",
+      "titre": "Étape 17",
+      "date": "2026-11-29",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 17 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "carte",
+        "consigne": "Maintiens ton doigt pour faire la mise au point",
+        "image": "img/jeu/carte-2.svg"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 18,
+      "phase": "La destination",
+      "titre": "Étape 18",
+      "date": "2026-12-02",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 18 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "cadenas",
+        "consigne": "Fais tourner la molette",
+        "position": 4,
+        "code": "0000",
+        "final": true
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 19,
+      "phase": "La destination",
+      "titre": "Étape 19",
+      "date": "2026-12-05",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 19 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "carte",
+        "consigne": "Maintiens ton doigt pour faire la mise au point",
+        "image": "img/jeu/carte-3.svg"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 20,
+      "phase": "La destination",
+      "titre": "Étape 20",
+      "date": "2026-12-08",
+      "heure": "21:30",
+      "manuel": false,
+      "question": {
+        "type": "profonde",
+        "texte": "Question 20 — À REMPLIR",
+        "motApres": ""
+      },
+      "jeu": {
+        "type": "puzzle",
+        "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
+        "image": "img/jeu/puzzle-3.svg",
+        "taille": 3
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    },
+    {
+      "n": 21,
+      "phase": "La destination",
+      "titre": "Étape 21",
+      "date": "2026-12-11",
+      "heure": null,
+      "manuel": true,
+      "question": {
+        "type": "verifiable",
+        "texte": "Question 21 — À REMPLIR",
+        "reponses": [
+          "reponse"
+        ],
+        "indice": ""
+      },
+      "jeu": {
+        "type": "gps",
+        "consigne": "C'est l'heure.",
+        "adresse": "1630 route de Merlan, 46330 Cabrerets",
+        "nomLieu": "(révélé à la fin)"
+      },
+      "recompense": {
+        "titre": "Ta récompense",
+        "texte": "Texte de la récompense — À REMPLIR"
+      }
+    }
+  ]
+}

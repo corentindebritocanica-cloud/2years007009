@@ -1,0 +1,13 @@
+{
+  "name": "jeu-de-piste-2ans",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:regles": "firebase emulators:exec --only firestore --project demo-jeu \"node tests/regles.test.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase": "^12.19.0",
+    "firebase-tools": "^15.32.1"
+  }
+}
