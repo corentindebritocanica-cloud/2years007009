@@ -8,8 +8,8 @@
   "id": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f1e7d3",
-  "theme_color": "#f1e7d3",
+  "background_color": "#140d17",
+  "theme_color": "#140d17",
   "icons": [
     {
       "src": "img/icone-192.png",

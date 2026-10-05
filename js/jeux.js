@@ -33,7 +33,7 @@ function grattage(zone, cfg, fini) {
     canvas.width = w * dpr; canvas.height = hh * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const g = ctx.createLinearGradient(0, 0, w, hh);
-    g.addColorStop(0, "#b8925a"); g.addColorStop(0.5, "#dcc395"); g.addColorStop(1, "#a37f4a");
+    g.addColorStop(0, "#c9a36b"); g.addColorStop(0.5, "#f1d8a8"); g.addColorStop(1, "#b98a4f");
     ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, hh);
     // petites paillettes
@@ -41,12 +41,12 @@ function grattage(zone, cfg, fini) {
       ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.35})`;
       ctx.fillRect(Math.random() * w, Math.random() * hh, 2, 2);
     }
-    ctx.fillStyle = "rgba(26,21,18,.78)";
-    ctx.font = `${Math.round(w / 16)}px Limelight, Didot, serif`;
+    ctx.fillStyle = "rgba(60,30,10,.75)";
+    ctx.font = `600 ${Math.round(w / 15)}px Georgia, serif`;
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText("✦ Gratte ici ✦", w / 2, hh / 2);
   }
-  (document.fonts?.load ? document.fonts.load("20px Limelight").catch(() => {}) : Promise.resolve()).then(() => requestAnimationFrame(peindre));
+  requestAnimationFrame(peindre);
 
   const pos = (e) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   function gratter(p) {
@@ -157,12 +157,12 @@ function puzzle(zone, cfg, fini) {
 function cadenas(zone, cfg, fini) {
   const code = String(cfg.code || "0000");
   const pos = (cfg.position || 1) - 1;
-  const molettes = [...code].map((c, i) => {
-    const connu = i < pos;
-    return h("div", { class: "molette" + (i === pos ? " cible" : "") + (connu || i === pos ? "" : " cachee") },
-      h("span", { class: "defile" }, connu ? c : i === pos ? "0" : "?"));
-  });
-  const cadenasEl = h("div", { class: "cadenas-icone", html: dessinCadenas(false) });
+  // Seul le chiffre du jour apparaît : les chiffres déjà gagnés ne sont JAMAIS rappelés,
+  // c'est à elle de les retenir.
+  const molettes = [...code].map((_, i) =>
+    h("div", { class: "molette" + (i === pos ? " cible" : " cachee") },
+      h("span", { class: "defile" }, i === pos ? "0" : "?")));
+  const cadenasEl = h("div", { class: "grand-emoji cadenas-icone" }, "🔒");
   const rangee = h("div", { class: "molettes" }, molettes);
   const btn = h("button", { class: "btn" }, "Faire tourner");
   const info = h("p", { class: "doux", style: "text-align:center" }, `Chiffre ${pos + 1} sur 4`);
@@ -180,10 +180,10 @@ function cadenas(zone, cfg, fini) {
         molettes[pos].classList.remove("cible");
         btn.remove();
         if (cfg.final) {
-          info.textContent = `Le dernier chiffre est ${cible}. Tu as les 4 : à toi d'ouvrir le cadenas.`;
+          info.textContent = `Le 4e chiffre est ${cible}. Retrouve les trois autres dans ta mémoire et ouvre le cadenas.`;
           setTimeout(composer, 1300);
         } else {
-          info.textContent = `Retiens bien : le chiffre ${pos + 1} est ${cible}.`;
+          info.textContent = `Le chiffre n°${pos + 1} est ${cible}. Retiens-le bien : il ne sera plus jamais affiché.`;
           setTimeout(fini, 600);
         }
         return;
@@ -222,16 +222,25 @@ function cadenas(zone, cfg, fini) {
     info.textContent = "Compose le code";
     boite.append(msg, ouvrir);
 
+    let echecs = 0, indices = 0;
+    const aide = h("p", { class: "discret", style: "text-align:center" });
+    boite.append(aide);
     ouvrir.addEventListener("click", () => {
       if (valeurs.join("") === code) {
         ouvrir.remove(); msg.textContent = "";
-        cadenasEl.innerHTML = dessinCadenas(true); cadenasEl.classList.add("ouvert");
+        cadenasEl.textContent = "🔓"; cadenasEl.classList.add("ouvert");
         vibrer([20, 40, 60]);
         info.textContent = "Ouvert !";
         if (cfg.ouverture) boite.append(h("div", { class: "carte" }, h("p", { class: "recompense" }, cfg.ouverture)));
         setTimeout(fini, 700);
       } else {
         msg.className = "message erreur"; msg.textContent = "Ce n'est pas le bon code. Rassemble tes 4 chiffres.";
+        echecs++;
+        // Filet de sécurité : tous les 4 échecs, un chiffre est dévoilé (jamais le dernier).
+        if (echecs % 4 === 0 && indices < 3) {
+          indices++;
+          aide.textContent = "Petit coup de pouce : " + [...code].slice(0, indices).map((c, i) => `chiffre n°${i + 1} = ${c}`).join(", ");
+        }
         boite.classList.remove("secoue"); void boite.offsetWidth; boite.classList.add("secoue");
         vibrer([30, 50, 30]);
       }
@@ -384,15 +393,4 @@ function gps(zone, cfg, fini) {
       h("a", { class: "btn plein", href: `https://maps.apple.com/?daddr=${q}&dirflg=d` }, "Ouvrir dans Plans"),
       h("a", { class: "btn secondaire plein", href: `https://www.google.com/maps/dir/?api=1&destination=${q}` }, "Ouvrir dans Google Maps")));
   fini();
-}
-
-// Cadenas art déco dessiné (encre + rouge), fermé ou ouvert.
-function dessinCadenas(ouvert) {
-  const anse = ouvert ? "M30 46 V30 a20 20 0 0 1 40 0 V22" : "M30 46 V30 a20 20 0 0 1 40 0 V46";
-  return `<svg viewBox="0 0 100 110" width="84" height="92" aria-hidden="true">
-    <path d="${anse}" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
-    <rect x="16" y="46" width="68" height="56" rx="4" fill="var(--surface)" stroke="currentColor" stroke-width="3"/>
-    <rect x="22" y="52" width="56" height="44" rx="2" fill="none" stroke="var(--ambre)" stroke-width="1.5"/>
-    <path d="M50 62 l3 8 h8 l-6.5 5 2.5 8 -7 -5 -7 5 2.5 -8 -6.5 -5 h8z" fill="var(--ambre)"/>
-  </svg>`;
 }

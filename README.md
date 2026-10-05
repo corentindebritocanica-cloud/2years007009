@@ -52,7 +52,7 @@ Chaque étape :
   - `grattage` : `cache`
   - `memoire` : `photos[]` `{image, legende}` (5 photos → 10 cartes, puis frise chronologique)
   - `puzzle` : `image` (carrée), `taille` (3)
-  - `cadenas` (virtuel) : `code` (4 chiffres), `position` (1-4) ; `final: true` à l'étape 18 → elle gagne le 4e chiffre puis compose le code, `ouverture` = message affiché à l'ouverture
+  - `cadenas` (virtuel) : `code` (4 chiffres), `position` (1-4) ; seul le chiffre du jour s'affiche, jamais rappelé ensuite (ni récompense, ni rejouer). `final: true` à l'étape 18 → 4e chiffre puis saisie du code ; un chiffre dévoilé tous les 4 échecs ; `ouverture` = message à l'ouverture
   - `anagramme` : `mot`, `indice` (optionnel), `revelation` (message une fois le mot trouvé)
   - `choix` : `options[]` `{id, nom, image}`, `elimine`, `dejaElimines[]`, `indice`
   - `carte` : `image` (floue puis nette en maintenant le doigt)
