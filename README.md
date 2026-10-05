@@ -7,9 +7,15 @@ PWA iPhone (GitHub Pages) + Firebase (Auth, Firestore, FCM) + relais Google Apps
 
 - **Un seul écran de connexion** (e-mail + mot de passe), persistant : l'appareil reste
   connecté tant qu'on ne se déconnecte pas (jeton Firebase en IndexedDB).
-- **Rôle selon l'UID** : l'UID admin ouvre le tableau de bord, l'UID joueuse ouvre le jeu.
-  Les deux UID sont déclarés dans `js/config.js`, `firestore.rules` et `relais/Code.gs`.
-- L'admin peut **prévisualiser** tout le jeu (bouton « Aperçu ») sans rien écrire.
+- **Un seul accueil pour vous deux** : après connexion, tout le monde arrive sur le jeu.
+- **Logo en bas de l'accueil → code à 4 chiffres → espace admin.** Le déverrouillage tient
+  jusqu'à la fermeture de l'app (bouton « Verrouiller l'admin » dans Réglages).
+- Le code ne protège que l'écran. Les données admin (réponses, journal, déblocages) restent
+  protégées par `firestore.rules` : seul l'UID admin peut les lire.
+- Sur le compte admin, l'accueil montre l'état réel du jeu en **lecture seule** :
+  on peut jouer une étape sans rien enregistrer à la place de Lisa.
+- L'admin peut aussi **prévisualiser** tout le jeu, étapes non débloquées comprises (bouton « Aperçu »).
+- Pour changer le code : empreinte SHA-256 de `jeu-2ans:XXXX` dans `CODE_ADMIN_SHA256` (`js/config.js`).
 
 ## Structure
 
@@ -20,6 +26,7 @@ PWA iPhone (GitHub Pages) + Firebase (Auth, Firestore, FCM) + relais Google Apps
 | `js/joueuse.js` | Accueil, jauge, compte à rebours, déroulé d'une étape |
 | `js/jeux.js` | Mini-jeux : grattage, mémoire, puzzle, cadenas, choix, carte, colis, gps |
 | `js/admin.js` | Suivi, réponses, journal, déblocage manuel, notifs de test, remise à zéro |
+| `js/code.js` | Pavé à code de l'accès admin |
 | `js/firebase.js` | Init Firebase, persistance, jeton push |
 | `js/config.js` | Config web Firebase (publique), UID admin, URL du relais |
 | `sw.js` | Service worker **sans SDK Firebase** : affiche toujours la notif (règle iOS) |

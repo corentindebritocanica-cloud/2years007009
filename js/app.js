@@ -35,13 +35,25 @@ fb.surAuth(async (user) => {
   if (!user) return ecranConnexion();
   chargement();
   const jeu = await chargerJeu();
-  if (user.uid === UID_ADMIN) {
+  const { demarrerJeu } = await import("./joueuse.js");
+
+  // Un seul accueil pour tout le monde. L'admin s'ouvre depuis le logo + code.
+  const accueil = () => {
+    arreterVue();
+    arreterVue = demarrerJeu(racine, fb, jeu, user, {
+      apercu: false,
+      // Le compte admin voit l'état réel du jeu mais n'écrit jamais la progression de Lisa.
+      lectureSeule: user.uid === UID_ADMIN,
+      ouvrirAdmin: admin,
+    });
+  };
+  const admin = async () => {
+    arreterVue();
+    history.replaceState(null, "", location.pathname);
     const { demarrerAdmin } = await import("./admin.js");
-    arreterVue = demarrerAdmin(racine, fb, jeu, user);
-  } else {
-    const { demarrerJeu } = await import("./joueuse.js");
-    arreterVue = demarrerJeu(racine, fb, jeu, user, { apercu: false });
-  }
+    arreterVue = demarrerAdmin(racine, fb, jeu, user, { retour: accueil });
+  };
+  accueil();
 });
 
 // ---------------------------------------------------------------- Connexion

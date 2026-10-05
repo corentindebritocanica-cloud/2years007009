@@ -23,6 +23,10 @@ try {
 } catch {
   db = fs.getFirestore(app);
 }
+// Développement uniquement : http://localhost:8000/?emu → émulateur Firestore local.
+if (location.hostname === "localhost" && new URLSearchParams(location.search).has("emu")) {
+  fs.connectFirestoreEmulator(db, "127.0.0.1", 8085);
+}
 export { db, fs, authMod };
 
 export const connexion = (email, mdp) =>

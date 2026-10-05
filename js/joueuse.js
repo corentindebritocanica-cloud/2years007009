@@ -6,8 +6,9 @@ import {
   estIOS, confettis, tutoInstallation,
 } from "./outils.js";
 import { lancerJeu } from "./jeux.js";
+import { demanderCode } from "./code.js";
 
-export function demarrerJeu(racine, fb, jeu, user, { apercu = false, quitter } = {}) {
+export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeule = false, quitter, ouvrirAdmin } = {}) {
   const { db, fs } = fb;
   const N = jeu.etapes.length;
   const etat = { ouvertes: new Map(), prog: {}, pret: { e: false, p: false } };
@@ -42,13 +43,13 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, quitter } =
 
   async function ecrireProgression(n, champs) {
     etat.prog[n] = { ...(etat.prog[n] || {}), ...champs };
-    if (apercu) return;
+    if (apercu || lectureSeule) return;
     const data = { ...champs };
     if (champs.termineeA === true) data.termineeA = fs.serverTimestamp();
     await fs.setDoc(fs.doc(db, "progression", String(n)), data, { merge: true });
   }
   async function ecrireReponse(n, texte) {
-    if (apercu) return;
+    if (apercu || lectureSeule) return;
     await fs.setDoc(fs.doc(db, "reponses", String(n)), { texte, ecritA: fs.serverTimestamp() });
   }
 
@@ -155,10 +156,19 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, quitter } =
       principal,
       jauge,
       h("section", { class: "pile" }, h("span", { class: "surtitre" }, "Le chemin"), grille),
-      apercu ? null : h("button", {
-        class: "btn fantome", style: "align-self:center",
-        onclick: () => { if (confirm("Se déconnecter de l'app ?")) fb.deconnexion(); },
-      }, "Se déconnecter")));
+      apercu ? null : piedDePage()));
+  }
+
+  // Logo en bas de l'accueil : ouvre le pavé à code, puis l'espace admin.
+  function piedDePage() {
+    const logo = h("button", { class: "logo-pied", "aria-label": "Notre jeu" },
+      h("img", { src: "img/icone-192.png", alt: "", width: 44, height: 44 }));
+    logo.addEventListener("click", async () => {
+      if (!ouvrirAdmin) return;
+      if (await demanderCode()) ouvrirAdmin();
+    });
+    return h("footer", { class: "pied" }, logo,
+      lectureSeule ? h("p", { class: "discret" }, "Vue de Lisa · tes actions ici ne sont pas enregistrées") : null);
   }
 
   function carteNotifications() {

@@ -1,10 +1,11 @@
 // Tableau de bord admin : suivi des 21 étapes, réponses de Lisa, journal du relais,
 // déblocage manuel (étape 21 et secours), notifications de test, aperçu du jeu.
 import { h, dateParis, dateCourte, toDate } from "./outils.js";
-import { RELAIS_URL } from "./config.js";
+import { RELAIS_URL, UID_ADMIN } from "./config.js";
+import { verrouillerAdmin } from "./code.js";
 import { demarrerJeu } from "./joueuse.js";
 
-export function demarrerAdmin(racine, fb, jeu, user) {
+export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
   const { db, fs } = fb;
   const etat = { etapes: {}, prog: {}, reponses: {}, journal: [], abonnes: {} };
   const desabos = [];
@@ -75,7 +76,7 @@ export function demarrerAdmin(racine, fb, jeu, user) {
     if (n) history.replaceState(null, "", `?etape=${n}`);
     sousVue = demarrerJeu(racine, fb, jeu, user, {
       apercu: true,
-      quitter: () => { sousVue?.(); sousVue = null; history.replaceState(null, "", location.pathname); demarrerAdmin(racine, fb, jeu, user); },
+      quitter: () => { sousVue?.(); sousVue = null; history.replaceState(null, "", location.pathname); demarrerAdmin(racine, fb, jeu, user, { retour }); },
     });
   }
 
@@ -92,8 +93,11 @@ export function demarrerAdmin(racine, fb, jeu, user) {
     const contenu = { suivi: vueSuivi, reponses: vueReponses, journal: vueJournal, reglages: vueReglages }[onglet]();
     racine.replaceChildren(h("main", { class: "ecran" },
       h("header", { class: "entete" },
-        h("div", {}, h("div", { class: "surtitre" }, "Admin"), h("div", { class: "titre-app" }, "Tableau de bord")),
+        h("button", { class: "icone-btn", "aria-label": "Retour à l'accueil", onclick: () => retour?.() }, "‹"),
+        h("div", { style: "flex:1" }, h("div", { class: "surtitre" }, "Admin"), h("div", { class: "titre-app" }, "Tableau de bord")),
         h("button", { class: "btn secondaire petit", onclick: () => apercu() }, "👁 Aperçu")),
+      user.uid === UID_ADMIN ? null : h("div", { class: "bandeau alerte" },
+        "Ce compte n'a pas les droits admin : le suivi, les réponses et le journal restent masqués."),
       h("nav", { class: "onglets" }, tabs.map(([id, nom]) =>
         h("button", { class: onglet === id ? "actif" : "", onclick: () => { onglet = id; rendre(); window.scrollTo(0, 0); } }, nom))),
       contenu));
@@ -187,7 +191,8 @@ export function demarrerAdmin(racine, fb, jeu, user) {
         h("button", { class: "btn danger plein", onclick: reinitialiser }, "Remettre le jeu à zéro")),
       h("section", { class: "carte pile" },
         h("p", { class: "discret" }, `Connecté : ${user.email}`),
-        h("button", { class: "btn fantome", onclick: () => { if (confirm("Se déconnecter ?")) fb.deconnexion(); } }, "Se déconnecter")));
+        h("button", { class: "btn secondaire plein", onclick: () => { verrouillerAdmin(); retour?.(); } }, "Verrouiller l'admin"),
+        h("button", { class: "btn fantome", onclick: () => { if (confirm("Se déconnecter de cet appareil ?")) { verrouillerAdmin(); fb.deconnexion(); } } }, "Se déconnecter")));
   }
 
   rendre();
