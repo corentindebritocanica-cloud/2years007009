@@ -2,7 +2,7 @@
 // une seule fois quand le jeu est gagné. Elle renvoie une fonction de nettoyage.
 import { h, melanger, vibrer } from "./outils.js";
 
-export const MINI_JEUX = { grattage, memoire, puzzle, cadenas, choix, carte, colis, gps };
+export const MINI_JEUX = { grattage, memoire, puzzle, cadenas, anagramme, choix, carte, colis, gps };
 
 export function lancerJeu(zone, cfg, fini) {
   const f = MINI_JEUX[cfg.type];
@@ -151,8 +151,9 @@ function puzzle(zone, cfg, fini) {
   zone.append(grille);
 }
 
-// ---------------------------------------------------------------- Cadenas
-// position = rang du chiffre révélé (1 à 4). Les chiffres d'avant sont déjà connus.
+// ---------------------------------------------------------------- Cadenas virtuel
+// Étapes 10, 12, 14 : elle gagne un chiffre (position 1 à 3).
+// Étape 18 (final) : elle gagne le 4e chiffre, puis compose le code complet pour ouvrir.
 function cadenas(zone, cfg, fini) {
   const code = String(cfg.code || "0000");
   const pos = (cfg.position || 1) - 1;
@@ -161,9 +162,12 @@ function cadenas(zone, cfg, fini) {
     return h("div", { class: "molette" + (i === pos ? " cible" : "") + (connu || i === pos ? "" : " cachee") },
       h("span", { class: "defile" }, connu ? c : i === pos ? "0" : "?"));
   });
+  const cadenasEl = h("div", { class: "grand-emoji cadenas-icone" }, "🔒");
+  const rangee = h("div", { class: "molettes" }, molettes);
   const btn = h("button", { class: "btn" }, "Faire tourner");
   const info = h("p", { class: "doux", style: "text-align:center" }, `Chiffre ${pos + 1} sur 4`);
-  zone.append(h("div", { class: "cadenas" }, h("div", { class: "grand-emoji" }, "🔒"), h("div", { class: "molettes" }, molettes), info, btn));
+  const boite = h("div", { class: "cadenas" }, cadenasEl, rangee, info, btn);
+  zone.append(boite);
 
   btn.addEventListener("click", () => {
     btn.disabled = true;
@@ -174,13 +178,14 @@ function cadenas(zone, cfg, fini) {
       span.textContent = String(k % 10); vibrer(4);
       if (k >= tours) {
         molettes[pos].classList.remove("cible");
+        btn.remove();
         if (cfg.final) {
-          info.textContent = `Le code complet : ${code}. Va ouvrir la boîte 🗝️`;
+          info.textContent = `Le dernier chiffre est ${cible}. Tu as les 4 : à toi d'ouvrir le cadenas.`;
+          setTimeout(composer, 1300);
         } else {
           info.textContent = `Retiens bien : le chiffre ${pos + 1} est ${cible}.`;
+          setTimeout(fini, 600);
         }
-        btn.remove();
-        setTimeout(fini, 600);
         return;
       }
       k++;
@@ -188,6 +193,103 @@ function cadenas(zone, cfg, fini) {
     };
     tick();
   });
+
+  // Saisie du code complet sur 4 molettes (flèches ou glissé vertical).
+  function composer() {
+    const valeurs = [0, 0, 0, 0];
+    const cases = valeurs.map((_, i) => {
+      const chiffre = h("span", { class: "defile" }, "0");
+      const maj = (d) => { valeurs[i] = (valeurs[i] + d + 10) % 10; chiffre.textContent = valeurs[i]; vibrer(5); };
+      const haut = h("button", { class: "fleche", type: "button", "aria-label": `Chiffre ${i + 1} plus` }, "▲");
+      const bas = h("button", { class: "fleche", type: "button", "aria-label": `Chiffre ${i + 1} moins` }, "▼");
+      haut.addEventListener("click", () => maj(1));
+      bas.addEventListener("click", () => maj(-1));
+      const mol = h("div", { class: "molette saisie" }, chiffre);
+      let y0 = null;
+      mol.addEventListener("pointerdown", (e) => { y0 = e.clientY; mol.setPointerCapture(e.pointerId); });
+      mol.addEventListener("pointermove", (e) => {
+        if (y0 === null) return;
+        const dy = e.clientY - y0;
+        if (Math.abs(dy) > 22) { maj(dy < 0 ? 1 : -1); y0 = e.clientY; }
+      });
+      const lacher = () => { y0 = null; };
+      mol.addEventListener("pointerup", lacher); mol.addEventListener("pointercancel", lacher);
+      return h("div", { class: "colonne-molette" }, haut, mol, bas);
+    });
+    const msg = h("p", { class: "message", style: "text-align:center" });
+    const ouvrir = h("button", { class: "btn" }, "Ouvrir le cadenas");
+    rangee.replaceWith(h("div", { class: "molettes composer" }, cases));
+    info.textContent = "Compose le code";
+    boite.append(msg, ouvrir);
+
+    ouvrir.addEventListener("click", () => {
+      if (valeurs.join("") === code) {
+        ouvrir.remove(); msg.textContent = "";
+        cadenasEl.textContent = "🔓"; cadenasEl.classList.add("ouvert");
+        vibrer([20, 40, 60]);
+        info.textContent = "Ouvert !";
+        if (cfg.ouverture) boite.append(h("div", { class: "carte" }, h("p", { class: "recompense" }, cfg.ouverture)));
+        setTimeout(fini, 700);
+      } else {
+        msg.className = "message erreur"; msg.textContent = "Ce n'est pas le bon code. Rassemble tes 4 chiffres.";
+        boite.classList.remove("secoue"); void boite.offsetWidth; boite.classList.add("secoue");
+        vibrer([30, 50, 30]);
+      }
+    });
+  }
+}
+
+// ---------------------------------------------------------------- Anagramme
+// Les lettres d'un mot-indice sont mélangées : elle les touche dans l'ordre pour le reformer.
+function anagramme(zone, cfg, fini) {
+  const mot = String(cfg.mot || "").toUpperCase();
+  const lettres = [...mot].filter((c) => c !== " ");
+  let ordre = lettres.map((c, i) => ({ c, i }));
+  if (lettres.length > 1) {
+    do { ordre = melanger(ordre); } while (ordre.map((o) => o.c).join("") === lettres.join(""));
+  }
+  const placees = []; // indices dans `ordre`
+  const cases = h("div", { class: "anag-cases" });
+  const reserve = h("div", { class: "anag-reserve" });
+  const msg = h("p", { class: "message", style: "text-align:center" });
+  const effacer = h("button", { class: "btn secondaire petit", type: "button" }, "Tout effacer");
+  if (cfg.indice) zone.append(h("div", { class: "bandeau" }, cfg.indice));
+  zone.append(cases, reserve, h("div", { style: "display:flex;justify-content:center" }, effacer), msg);
+
+  function dessiner() {
+    cases.replaceChildren(...lettres.map((_, k) => {
+      const idx = placees[k];
+      const el = h("button", { class: "anag-case" + (idx !== undefined ? " pleine" : ""), type: "button" }, idx !== undefined ? ordre[idx].c : "");
+      if (idx !== undefined) el.addEventListener("click", () => { placees.splice(k, 1); msg.textContent = ""; dessiner(); });
+      return el;
+    }));
+    reserve.replaceChildren(...ordre.map((o, idx) => {
+      const prise = placees.includes(idx);
+      const el = h("button", { class: "anag-lettre" + (prise ? " prise" : ""), type: "button", disabled: prise }, o.c);
+      el.addEventListener("click", () => {
+        if (prise || placees.length >= lettres.length) return;
+        placees.push(idx); vibrer(6); dessiner();
+        if (placees.length === lettres.length) verifier();
+      });
+      return el;
+    }));
+  }
+  function verifier() {
+    const essai = placees.map((i) => ordre[i].c).join("");
+    if (essai === lettres.join("")) {
+      cases.classList.add("ok");
+      [...reserve.children].forEach((b) => { b.disabled = true; });
+      effacer.remove();
+      msg.className = "message ok"; msg.textContent = cfg.revelation || "Bravo !";
+      setTimeout(fini, 700);
+    } else {
+      msg.className = "message erreur"; msg.textContent = "Presque… réessaie.";
+      cases.classList.remove("secoue"); void cases.offsetWidth; cases.classList.add("secoue");
+      vibrer([30, 50, 30]);
+    }
+  }
+  effacer.addEventListener("click", () => { placees.length = 0; msg.textContent = ""; dessiner(); });
+  dessiner();
 }
 
 // ---------------------------------------------------------------- Choix piège

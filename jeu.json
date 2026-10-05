@@ -263,9 +263,11 @@
         "indice": ""
       },
       "jeu": {
-        "type": "colis",
-        "consigne": "Quelque chose est arrivé pour toi…",
-        "indice": "Va voir … (À REMPLIR : où est caché le colis)"
+        "type": "anagramme",
+        "consigne": "Remets les lettres dans l'ordre pour trouver le mot-indice",
+        "mot": "EVASION",
+        "indice": "",
+        "revelation": "Évasion. Garde ce mot en tête…"
       },
       "recompense": {
         "titre": "Ta récompense",
@@ -286,7 +288,7 @@
       },
       "jeu": {
         "type": "cadenas",
-        "consigne": "Fais tourner la molette",
+        "consigne": "Fais tourner la molette pour gagner un chiffre du cadenas",
         "position": 1,
         "code": "0000",
         "final": false
@@ -362,7 +364,7 @@
       },
       "jeu": {
         "type": "cadenas",
-        "consigne": "Fais tourner la molette",
+        "consigne": "Fais tourner la molette pour gagner un chiffre du cadenas",
         "position": 2,
         "code": "0000",
         "final": false
@@ -439,7 +441,7 @@
       },
       "jeu": {
         "type": "cadenas",
-        "consigne": "Fais tourner la molette",
+        "consigne": "Fais tourner la molette pour gagner un chiffre du cadenas",
         "position": 3,
         "code": "0000",
         "final": false
@@ -566,10 +568,11 @@
       },
       "jeu": {
         "type": "cadenas",
-        "consigne": "Fais tourner la molette",
+        "consigne": "Gagne le dernier chiffre, puis compose le code",
         "position": 4,
         "code": "0000",
-        "final": true
+        "final": true,
+        "ouverture": "Message à l'ouverture du cadenas — À REMPLIR (un mot de toi + un indice, ex. « Prends ton maillot de bain »)"
       },
       "recompense": {
         "titre": "Ta récompense",

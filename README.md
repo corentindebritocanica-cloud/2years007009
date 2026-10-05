@@ -23,7 +23,7 @@ PWA iPhone (GitHub Pages) + Firebase (Auth, Firestore, FCM) + relais Google Apps
 | `index.html` | Coquille PWA (meta iOS, safe areas) |
 | `js/app.js` | Connexion + routage par rôle |
 | `js/joueuse.js` | Accueil, jauge, compte à rebours, déroulé d'une étape |
-| `js/jeux.js` | Mini-jeux : grattage, mémoire, puzzle, cadenas, choix, carte, colis, gps |
+| `js/jeux.js` | Mini-jeux : grattage, mémoire, puzzle, cadenas virtuel, anagramme, choix, carte, colis, gps |
 | `js/admin.js` | Suivi, réponses, journal, déblocage manuel, notifs de test, remise à zéro |
 | `js/code.js` | Pavé à code de l'accès admin |
 | `js/firebase.js` | Init Firebase, persistance, jeton push |
@@ -52,7 +52,8 @@ Chaque étape :
   - `grattage` : `cache`
   - `memoire` : `photos[]` `{image, legende}` (5 photos → 10 cartes, puis frise chronologique)
   - `puzzle` : `image` (carrée), `taille` (3)
-  - `cadenas` : `code` (4 chiffres), `position` (1-4), `final` (true à l'étape 18)
+  - `cadenas` (virtuel) : `code` (4 chiffres), `position` (1-4) ; `final: true` à l'étape 18 → elle gagne le 4e chiffre puis compose le code, `ouverture` = message affiché à l'ouverture
+  - `anagramme` : `mot`, `indice` (optionnel), `revelation` (message une fois le mot trouvé)
   - `choix` : `options[]` `{id, nom, image}`, `elimine`, `dejaElimines[]`, `indice`
   - `carte` : `image` (floue puis nette en maintenant le doigt)
   - `colis` : `indice` (où trouver le colis)
