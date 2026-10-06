@@ -210,7 +210,7 @@ label.etiquette { font-size: 0.85rem; color: var(--texte-2); font-weight: 600; }
 .memoire.bloquee { pointer-events: none; }
 .memoire.perdue .cm { opacity: .45; transition: opacity .3s; }
 .memoire .cm { aspect-ratio: 3 / 4; perspective: 600px; cursor: pointer; }
-.memoire .cm .in { position: relative; width: 100%; height: 100%; transition: transform 0.35s; transform-style: preserve-3d; }
+.memoire .cm .in { position: relative; width: 100%; height: 100%; transition: transform 0.14s ease-out; transform-style: preserve-3d; }
 .memoire .cm.vue .in, .memoire .cm.trouvee .in { transform: rotateY(180deg); }
 .memoire .face { position: absolute; inset: 0; border-radius: 9px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
 .memoire .dos { background: linear-gradient(135deg, var(--surface-2), var(--surface)); border: 1px solid var(--trait); display: grid; place-items: center; color: var(--ambre); font-family: var(--display); font-size: 1.1rem; }

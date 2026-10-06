@@ -136,7 +136,8 @@ function memoire(zone, cfg, fini) {
         h("div", { class: "in" },
           h("div", { class: "face dos" }, "♡"),
           h("div", { class: "face recto" }, h("img", { src: c.p.image, alt: "", draggable: "false" }))));
-      el.addEventListener("click", () => {
+      el.addEventListener("pointerdown", (ev) => {
+        ev.preventDefault();
         if (!enCours || verrou || el.classList.contains("vue") || el.classList.contains("trouvee")) return;
         el.classList.add("vue"); ouvertes.push({ el, c });
         if (ouvertes.length < 2) return;
@@ -147,9 +148,9 @@ function memoire(zone, cfg, fini) {
             a.el.classList.add("trouvee"); b.el.classList.add("trouvee");
             ouvertes = []; verrou = false; trouvees++; vibrer(15);
             if (trouvees === photos.length) gagne();
-          }, 250);
+          }, 150);
         } else {
-          setTimeout(() => { a.el.classList.remove("vue"); b.el.classList.remove("vue"); ouvertes = []; verrou = false; }, 650);
+          setTimeout(() => { a.el.classList.remove("vue"); b.el.classList.remove("vue"); ouvertes = []; verrou = false; }, 450);
         }
       });
       grille.append(el);
