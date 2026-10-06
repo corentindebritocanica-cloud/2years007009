@@ -54,7 +54,7 @@
       },
       "jeu": {
         "type": "memoire",
-        "consigne": "Retrouve les 5 paires en moins de 10 secondes",
+        "consigne": "Retrouve les 5 paires en moins de 15 secondes",
         "photos": [
           {
             "image": "img/jeu/q2-1.jpg",
@@ -76,7 +76,8 @@
             "image": "img/jeu/q2-5.jpg",
             "legende": "10 mai 2026"
           }
-        ]
+        ],
+        "secondes": 15
       },
       "recompense": {
         "titre": "Ta récompense",
@@ -172,7 +173,7 @@
       },
       "jeu": {
         "type": "memoire",
-        "consigne": "Retrouve les 5 paires en moins de 10 secondes",
+        "consigne": "Retrouve les 5 paires en moins de 15 secondes",
         "photos": [
           {
             "image": "img/jeu/q5-1.jpg",
@@ -194,7 +195,8 @@
             "image": "img/jeu/q5-5.jpg",
             "legende": "15 août 2026"
           }
-        ]
+        ],
+        "secondes": 15
       },
       "recompense": {
         "titre": "Ta récompense",

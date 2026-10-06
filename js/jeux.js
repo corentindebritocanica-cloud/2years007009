@@ -116,7 +116,7 @@ function verrouillerPage() {
 // ---------------------------------------------------------------- Mémoire (chrono 10 s)
 function memoire(zone, cfg, fini) {
   const photos = cfg.photos || [];
-  const DUREE = (cfg.secondes || 10) * 1000;
+  const DUREE = (cfg.secondes || 15) * 1000;
   const scene = h("div", { class: "jeu-scene" });
   const chrono = h("div", { class: "chrono" }, h("span"));
   const msg = h("p", { class: "message", style: "text-align:center" });
