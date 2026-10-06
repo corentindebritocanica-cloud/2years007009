@@ -57,24 +57,24 @@
         "consigne": "Retrouve les paires",
         "photos": [
           {
-            "image": "img/jeu/photo-01.svg",
-            "legende": "Date 1 — À REMPLIR"
+            "image": "img/jeu/q2-1.jpg",
+            "legende": "12 mai 2026"
           },
           {
-            "image": "img/jeu/photo-02.svg",
-            "legende": "Date 2 — À REMPLIR"
+            "image": "img/jeu/q2-2.jpg",
+            "legende": "8 mai 2026"
           },
           {
-            "image": "img/jeu/photo-03.svg",
-            "legende": "Date 3 — À REMPLIR"
+            "image": "img/jeu/q2-3.jpg",
+            "legende": "8 mai 2026"
           },
           {
-            "image": "img/jeu/photo-04.svg",
-            "legende": "Date 4 — À REMPLIR"
+            "image": "img/jeu/q2-4.jpg",
+            "legende": "10 mai 2026"
           },
           {
-            "image": "img/jeu/photo-05.svg",
-            "legende": "Date 5 — À REMPLIR"
+            "image": "img/jeu/q2-5.jpg",
+            "legende": "10 mai 2026"
           }
         ]
       },
@@ -103,7 +103,7 @@
       "jeu": {
         "type": "puzzle",
         "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
-        "image": "img/jeu/puzzle-1.svg",
+        "image": "img/jeu/puzzle-1.jpg",
         "taille": 3
       },
       "recompense": {
@@ -175,24 +175,24 @@
         "consigne": "Retrouve les paires",
         "photos": [
           {
-            "image": "img/jeu/photo-06.svg",
-            "legende": "Date 1 — À REMPLIR"
+            "image": "img/jeu/q5-1.jpg",
+            "legende": "8 mai 2026"
           },
           {
-            "image": "img/jeu/photo-07.svg",
-            "legende": "Date 2 — À REMPLIR"
+            "image": "img/jeu/q5-2.jpg",
+            "legende": "8 mai 2026"
           },
           {
-            "image": "img/jeu/photo-08.svg",
-            "legende": "Date 3 — À REMPLIR"
+            "image": "img/jeu/q5-3.jpg",
+            "legende": ""
           },
           {
-            "image": "img/jeu/photo-09.svg",
-            "legende": "Date 4 — À REMPLIR"
+            "image": "img/jeu/q5-4.jpg",
+            "legende": ""
           },
           {
-            "image": "img/jeu/photo-10.svg",
-            "legende": "Date 5 — À REMPLIR"
+            "image": "img/jeu/q5-5.jpg",
+            "legende": "15 août 2026"
           }
         ]
       },
@@ -216,7 +216,7 @@
       "jeu": {
         "type": "puzzle",
         "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
-        "image": "img/jeu/puzzle-2.svg",
+        "image": "img/jeu/puzzle-2.jpg",
         "taille": 3
       },
       "recompense": {
@@ -648,7 +648,7 @@
       "jeu": {
         "type": "puzzle",
         "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
-        "image": "img/jeu/puzzle-3.svg",
+        "image": "img/jeu/puzzle-3.jpg",
         "taille": 3
       },
       "recompense": {

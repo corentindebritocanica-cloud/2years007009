@@ -112,7 +112,7 @@ function memoire(zone, cfg, fini) {
   function montrerFrise() {
     const frise = h("div", { class: "frise" },
       photos.map((p) => h("figure", {}, h("img", { src: p.image, alt: "" }), h("figcaption", {}, p.legende || ""))));
-    grille.replaceWith(h("div", { class: "pile" }, h("p", { class: "doux" }, "Dans l'ordre :"), frise));
+    grille.replaceWith(h("div", { class: "pile" }, h("p", { class: "doux" }, "Nos souvenirs :"), frise));
     fini();
   }
 }
