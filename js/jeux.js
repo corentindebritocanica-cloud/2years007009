@@ -1,6 +1,6 @@
 // Les mini-jeux. Chaque fonction reçoit (zone, config, fini) et appelle fini()
 // une seule fois quand le jeu est gagné. Elle renvoie une fonction de nettoyage.
-import { h, melanger, vibrer } from "./outils.js";
+import { h, melanger, vibrer, confettis } from "./outils.js";
 
 export const MINI_JEUX = { grattage, memoire, puzzle, cadenas, anagramme, choix, carte, colis, gps };
 
@@ -77,78 +77,235 @@ function grattage(zone, cfg, fini) {
   canvas.addEventListener("pointercancel", stop);
 }
 
-// ---------------------------------------------------------------- Mémoire
-function memoire(zone, cfg, fini) {
-  const photos = cfg.photos || [];
-  const cartes = melanger(photos.flatMap((p, i) => [{ i, p }, { i, p }]));
-  const grille = h("div", { class: "memoire" });
-  let ouvertes = [], verrou = false, trouvees = 0;
+// ---------------------------------------------------------------- Outils communs aux jeux photo
 
-  cartes.forEach((c) => {
-    const el = h("div", { class: "cm", role: "button", "aria-label": "Carte" },
-      h("div", { class: "in" },
-        h("div", { class: "face dos" }, "♡"),
-        h("div", { class: "face recto" }, h("img", { src: c.p.image, alt: "", loading: "eager", draggable: "false" }))));
-    el.addEventListener("click", () => {
-      if (verrou || el.classList.contains("vue") || el.classList.contains("trouvee")) return;
-      el.classList.add("vue"); ouvertes.push({ el, c });
-      if (ouvertes.length < 2) return;
-      verrou = true;
-      const [a, b] = ouvertes;
-      if (a.c.i === b.c.i) {
-        setTimeout(() => {
-          a.el.classList.add("trouvee"); b.el.classList.add("trouvee");
-          ouvertes = []; verrou = false; trouvees++; vibrer(15);
-          if (trouvees === photos.length) setTimeout(montrerFrise, 600);
-        }, 350);
-      } else {
-        setTimeout(() => { a.el.classList.remove("vue"); b.el.classList.remove("vue"); ouvertes = []; verrou = false; }, 900);
-      }
-    });
-    grille.append(el);
+// « 3, 2, 1, GO ! » en surimpression sur la zone de jeu. Résout quand c'est parti.
+function compteARebours(cible) {
+  return new Promise((partir) => {
+    const chiffre = h("span", { class: "car-chiffre" });
+    const voile = h("div", { class: "car-voile", "aria-live": "assertive" }, chiffre);
+    cible.append(voile);
+    const etapes = ["3", "2", "1", "GO !"];
+    let k = 0;
+    const suivant = () => {
+      if (k === etapes.length) { voile.remove(); partir(); return; }
+      chiffre.textContent = etapes[k];
+      chiffre.classList.toggle("go", k === 3);
+      chiffre.classList.remove("pop"); void chiffre.offsetWidth; chiffre.classList.add("pop");
+      vibrer(k === 3 ? 40 : 15);
+      k++;
+      setTimeout(suivant, k === etapes.length ? 450 : 700);
+    };
+    suivant();
   });
-  zone.append(grille);
-
-  function montrerFrise() {
-    const frise = h("div", { class: "frise" },
-      photos.map((p) => h("figure", {}, h("img", { src: p.image, alt: "" }), h("figcaption", {}, p.legende || ""))));
-    grille.replaceWith(h("div", { class: "pile" }, h("p", { class: "doux" }, "Nos souvenirs :"), frise));
-    fini();
-  }
 }
 
-// ---------------------------------------------------------------- Puzzle (échange de pièces)
+// Bloque tout défilement de la page (haut/bas/gauche/droite) tant que le jeu est actif.
+function verrouillerPage() {
+  const bloquer = (e) => { if (e.touches && e.touches.length > 1) return; e.preventDefault(); };
+  document.addEventListener("touchmove", bloquer, { passive: false });
+  document.documentElement.classList.add("page-figee");
+  let libre = false;
+  return () => {
+    if (libre) return; libre = true;
+    document.removeEventListener("touchmove", bloquer, { passive: false });
+    document.documentElement.classList.remove("page-figee");
+  };
+}
+
+// ---------------------------------------------------------------- Mémoire (chrono 10 s)
+function memoire(zone, cfg, fini) {
+  const photos = cfg.photos || [];
+  const DUREE = (cfg.secondes || 10) * 1000;
+  const scene = h("div", { class: "jeu-scene" });
+  const chrono = h("div", { class: "chrono" }, h("span"));
+  const msg = h("p", { class: "message", style: "text-align:center" });
+  zone.append(chrono, scene, msg);
+  let minuteur = null, raf = null, termine = false, detruit = false;
+
+  function partie() {
+    msg.textContent = ""; msg.className = "message";
+    chrono.firstChild.style.transition = "none"; chrono.firstChild.style.width = "100%";
+    chrono.classList.remove("urgent");
+    const cartes = melanger(photos.flatMap((p, i) => [{ i, p }, { i, p }]));
+    const grille = h("div", { class: "memoire bloquee" });
+    let ouvertes = [], verrou = false, trouvees = 0, enCours = false;
+
+    cartes.forEach((c) => {
+      const el = h("div", { class: "cm", role: "button", "aria-label": "Carte" },
+        h("div", { class: "in" },
+          h("div", { class: "face dos" }, "♡"),
+          h("div", { class: "face recto" }, h("img", { src: c.p.image, alt: "", draggable: "false" }))));
+      el.addEventListener("click", () => {
+        if (!enCours || verrou || el.classList.contains("vue") || el.classList.contains("trouvee")) return;
+        el.classList.add("vue"); ouvertes.push({ el, c });
+        if (ouvertes.length < 2) return;
+        verrou = true;
+        const [a, b] = ouvertes;
+        if (a.c.i === b.c.i) {
+          setTimeout(() => {
+            a.el.classList.add("trouvee"); b.el.classList.add("trouvee");
+            ouvertes = []; verrou = false; trouvees++; vibrer(15);
+            if (trouvees === photos.length) gagne();
+          }, 250);
+        } else {
+          setTimeout(() => { a.el.classList.remove("vue"); b.el.classList.remove("vue"); ouvertes = []; verrou = false; }, 650);
+        }
+      });
+      grille.append(el);
+    });
+    scene.replaceChildren(grille);
+
+    compteARebours(scene).then(() => {
+      if (detruit) return;
+      enCours = true; grille.classList.remove("bloquee");
+      const barre = chrono.firstChild;
+      requestAnimationFrame(() => {
+        barre.style.transition = `width ${DUREE}ms linear`;
+        barre.style.width = "0%";
+      });
+      const t0 = performance.now();
+      const urgence = () => {
+        if (performance.now() - t0 > DUREE - 3000) chrono.classList.add("urgent");
+        else raf = requestAnimationFrame(urgence);
+      };
+      raf = requestAnimationFrame(urgence);
+      minuteur = setTimeout(perdu, DUREE);
+    });
+
+    function gagne() {
+      enCours = false; clearTimeout(minuteur); cancelAnimationFrame(raf);
+      termine = true;
+      const barre = chrono.firstChild; barre.style.width = getComputedStyle(barre).width; barre.style.transition = "none";
+      confettis();
+      setTimeout(montrerFrise, 700);
+    }
+    function perdu() {
+      if (termine) return;
+      enCours = false; grille.classList.add("bloquee", "perdue");
+      vibrer([40, 60, 40]);
+      msg.className = "message erreur"; msg.textContent = "Temps écoulé ! Les cartes vont être mélangées.";
+      const rejouer = h("button", { class: "btn plein" }, "Recommencer");
+      rejouer.addEventListener("click", () => { rejouer.remove(); partie(); });
+      msg.after(rejouer);
+    }
+  }
+
+  function montrerFrise() {
+    chrono.remove();
+    const frise = h("div", { class: "frise" },
+      photos.map((p) => h("figure", {}, h("img", { src: p.image, alt: "" }), p.legende ? h("figcaption", {}, p.legende) : null)));
+    scene.replaceWith(h("div", { class: "pile" }, h("p", { class: "doux" }, "Nos souvenirs :"), frise));
+    fini();
+  }
+
+  partie();
+  return () => { detruit = true; clearTimeout(minuteur); cancelAnimationFrame(raf); };
+}
+
+// ---------------------------------------------------------------- Puzzle (glisser une pièce sur sa voisine)
 function puzzle(zone, cfg, fini) {
   const n = cfg.taille || 3;
-  let ordre = [...Array(n * n).keys()];
-  do { ordre = melanger(ordre); } while (ordre.every((v, i) => v === i));
-  const grille = h("div", { class: "zone-jeu puzzle", style: `grid-template-columns:repeat(${n},1fr)` });
-  let choisie = null;
+  const total = n * n;
+  // ordre[case] = n° de pièce. Gagné quand ordre[i] === i partout.
+  let ordre = [...Array(total).keys()];
+  // Bien mélangé : au plus une pièce déjà à sa place.
+  do { ordre = melanger(ordre); } while (ordre.filter((v, i) => v === i).length > 1);
 
-  function dessiner() {
-    grille.replaceChildren(...ordre.map((v, idx) => {
-      const x = (v % n) / (n - 1) * 100, y = Math.floor(v / n) / (n - 1) * 100;
-      const p = h("div", {
-        class: "piece" + (choisie === idx ? " choisie" : ""),
-        style: `background-image:url('${cfg.image}');background-size:${n * 100}% ${n * 100}%;background-position:${x}% ${y}%`,
-      });
-      p.addEventListener("click", () => toucher(idx));
-      return p;
-    }));
-  }
-  function toucher(idx) {
-    if (grille.classList.contains("resolu")) return;
-    if (choisie === null) { choisie = idx; vibrer(8); }
-    else if (choisie === idx) choisie = null;
-    else {
-      [ordre[choisie], ordre[idx]] = [ordre[idx], ordre[choisie]];
-      choisie = null; vibrer(12);
-      if (ordre.every((v, i) => v === i)) { dessiner(); grille.classList.add("resolu"); setTimeout(fini, 700); return; }
+  const plateau = h("div", { class: "zone-jeu puzzle bloque" });
+  const pieces = [...Array(total).keys()].map((v) => {
+    const x = (v % n) / (n - 1) * 100, y = Math.floor(v / n) / (n - 1) * 100;
+    return h("div", {
+      class: "piece",
+      style: `width:${100 / n}%;height:${100 / n}%;background-image:url('${cfg.image}');background-size:${n * 100}% ${n * 100}%;background-position:${x}% ${y}%`,
+    });
+  });
+  pieces.forEach((p) => plateau.append(p));
+  const placer = () => ordre.forEach((v, c) => {
+    pieces[v].style.left = `${(c % n) * 100 / n}%`;
+    pieces[v].style.top = `${Math.floor(c / n) * 100 / n}%`;
+  });
+  placer();
+  zone.append(plateau);
+
+  const liberer = verrouillerPage();
+  let actif = false, resolu = false;
+  compteARebours(plateau).then(() => { actif = true; plateau.classList.remove("bloque"); });
+
+  // Case voisine dans une direction (haut/bas/gauche/droite uniquement), ou -1 au bord.
+  const voisine = (c, axe, sens) => {
+    if (axe === "x") {
+      const col = c % n + sens;
+      return col < 0 || col >= n ? -1 : c + sens;
     }
-    dessiner();
+    const lig = Math.floor(c / n) + sens;
+    return lig < 0 || lig >= n ? -1 : c + sens * n;
+  };
+
+  let drag = null;
+  plateau.addEventListener("pointerdown", (e) => {
+    if (!actif || resolu || drag) return;
+    const el = e.target.closest(".piece"); if (!el) return;
+    e.preventDefault();
+    const v = pieces.indexOf(el), c = ordre.indexOf(v);
+    plateau.setPointerCapture(e.pointerId);
+    drag = { id: e.pointerId, el, c, x0: e.clientX, y0: e.clientY, axe: null, cible: -1, d: 0, taille: plateau.clientWidth / n };
+    el.classList.add("prise");
+  });
+  plateau.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    if (!drag.axe) {
+      if (Math.hypot(dx, dy) < 6) return;
+      drag.axe = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+    }
+    let d = drag.axe === "x" ? dx : dy;
+    const cible = voisine(drag.c, drag.axe, Math.sign(d) || 1);
+    if (cible < 0) d = Math.sign(d) * Math.min(Math.abs(d) * 0.15, 10); // bord : petite résistance
+    else d = Math.max(-drag.taille, Math.min(drag.taille, d));
+    if (drag.cible >= 0 && drag.cible !== cible) pieces[ordre[drag.cible]].style.transform = "";
+    drag.cible = cible; drag.d = d;
+    const t = drag.axe === "x" ? `translate(${d}px,0)` : `translate(0,${d}px)`;
+    const ti = drag.axe === "x" ? `translate(${-d}px,0)` : `translate(0,${-d}px)`;
+    drag.el.style.transform = t;
+    if (cible >= 0) pieces[ordre[cible]].style.transform = ti;
+  });
+  const lacher = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const { el, c, cible, d, taille, axe } = drag;
+    drag = null;
+    el.classList.remove("prise");
+    const autre = cible >= 0 ? pieces[ordre[cible]] : null;
+    const echange = autre && Math.abs(d) > taille * 0.3;
+    [el, autre].forEach((p) => p && (p.style.transition = "transform .14s ease-out"));
+    if (echange) {
+      const s = Math.sign(d) * taille;
+      el.style.transform = axe === "x" ? `translate(${s}px,0)` : `translate(0,${s}px)`;
+      autre.style.transform = axe === "x" ? `translate(${-s}px,0)` : `translate(0,${-s}px)`;
+      vibrer(10);
+    } else {
+      el.style.transform = ""; if (autre) autre.style.transform = "";
+    }
+    setTimeout(() => {
+      [el, autre].forEach((p) => { if (p) { p.style.transition = "none"; p.style.transform = ""; } });
+      if (echange) {
+        [ordre[c], ordre[cible]] = [ordre[cible], ordre[c]];
+        placer();
+        if (ordre.every((v, i) => v === i)) gagne();
+      }
+    }, 150);
+  };
+  plateau.addEventListener("pointerup", lacher);
+  plateau.addEventListener("pointercancel", lacher);
+
+  function gagne() {
+    resolu = true;
+    plateau.classList.add("resolu");
+    liberer();
+    confettis();
+    setTimeout(fini, 700);
   }
-  dessiner();
-  zone.append(grille);
+  return () => { liberer(); };
 }
 
 // ---------------------------------------------------------------- Cadenas virtuel

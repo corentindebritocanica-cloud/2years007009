@@ -51,8 +51,8 @@ Chaque étape :
 - `question.type` : `verifiable` (comparée sans accents/majuscules/articles) ou `profonde` (toute réponse, enregistrée pour l'admin ; `motApres` optionnel).
 - Mini-jeux et paramètres :
   - `grattage` : `cache`
-  - `memoire` : `photos[]` `{image, legende}` (5 photos → 10 cartes, puis frise chronologique)
-  - `puzzle` : `image` (carrée), `taille` (3)
+  - `memoire` : `photos[]` `{image, legende}`, `secondes` (10 par défaut) — 3-2-1-GO, 10 cartes en 2 × 5, chrono ; temps écoulé → on remélange et on recommence ; gagné → confettis + frise
+  - `puzzle` : `image` (carrée), `taille` (3) — 3-2-1-GO, on glisse une pièce sur sa voisine directe (haut/bas/gauche/droite) pour les échanger ; page figée pendant la partie ; gagné → confettis
   - `cadenas` (virtuel) : `code` (4 chiffres), `position` (1-4) ; seul le chiffre du jour s'affiche, jamais rappelé ensuite (ni récompense, ni rejouer). `final: true` à l'étape 18 → 4e chiffre puis saisie du code ; un chiffre dévoilé tous les 4 échecs ; `ouverture` = message à l'ouverture
   - `anagramme` : `mot`, `indice` (optionnel), `revelation` (message une fois le mot trouvé)
   - `choix` : `options[]` `{id, nom, image}`, `elimine`, `dejaElimines[]`, `indice`

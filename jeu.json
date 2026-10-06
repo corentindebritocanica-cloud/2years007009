@@ -54,7 +54,7 @@
       },
       "jeu": {
         "type": "memoire",
-        "consigne": "Retrouve les paires",
+        "consigne": "Retrouve les 5 paires en moins de 10 secondes",
         "photos": [
           {
             "image": "img/jeu/q2-1.jpg",
@@ -102,7 +102,7 @@
       },
       "jeu": {
         "type": "puzzle",
-        "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
+        "consigne": "Fais glisser une pièce sur sa voisine pour les échanger et reconstitue la photo",
         "image": "img/jeu/puzzle-1.jpg",
         "taille": 3
       },
@@ -172,7 +172,7 @@
       },
       "jeu": {
         "type": "memoire",
-        "consigne": "Retrouve les paires",
+        "consigne": "Retrouve les 5 paires en moins de 10 secondes",
         "photos": [
           {
             "image": "img/jeu/q5-1.jpg",
@@ -215,7 +215,7 @@
       },
       "jeu": {
         "type": "puzzle",
-        "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
+        "consigne": "Fais glisser une pièce sur sa voisine pour les échanger et reconstitue la photo",
         "image": "img/jeu/puzzle-2.jpg",
         "taille": 3
       },
@@ -647,7 +647,7 @@
       },
       "jeu": {
         "type": "puzzle",
-        "consigne": "Remets la photo en ordre : touche deux pièces pour les échanger",
+        "consigne": "Fais glisser une pièce sur sa voisine pour les échanger et reconstitue la photo",
         "image": "img/jeu/puzzle-3.jpg",
         "taille": 3
       },
