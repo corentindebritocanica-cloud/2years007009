@@ -52,6 +52,20 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
     } catch (e) { alert(e.message); }
   }
 
+  // Ouvre d'un coup toutes les étapes pas encore ouvertes (sans notification). Pour tester ou en secours.
+  async function debloquerTout() {
+    const restantes = jeu.etapes.filter((e) => !etat.etapes[e.n]);
+    if (!restantes.length) { toast("Toutes les étapes sont déjà ouvertes"); return; }
+    if (!confirm(`Débloquer les ${restantes.length} étapes restantes d'un coup ? Aucune notification ne part, et Lisa pourra tout jouer immédiatement.`)) return;
+    if (prompt("Tape TOUT pour confirmer") !== "TOUT") return;
+    try {
+      const lot = fs.writeBatch(db);
+      restantes.forEach((e) => lot.set(fs.doc(db, "etapes", String(e.n)), { debloqueeA: fs.serverTimestamp(), mode: "manuel" }));
+      await lot.commit();
+      toast(`${restantes.length} étapes débloquées`);
+    } catch (e) { alert(e.message); }
+  }
+
   async function notifTest(cible) {
     try {
       const d = await relais("test", { cible, appareil: fb.idAppareil() });
@@ -112,7 +126,8 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
         h("div", { class: "pile", style: "gap:2px" }, h("span", { class: "surtitre" }, "Ouvertes"), h("strong", { style: "font-size:1.4rem" }, `${ouvertes} / 21`)),
         h("span", { class: "espace" }),
         h("div", { class: "pile", style: "gap:2px;text-align:right" }, h("span", { class: "surtitre" }, "Terminées"), h("strong", { style: "font-size:1.4rem" }, `${finies} / 21`))),
-      h("div", { class: "carte" }, jeu.etapes.map(ligneEtape)));
+      h("div", { class: "carte" }, jeu.etapes.map(ligneEtape)),
+      h("button", { class: "btn secondaire plein", onclick: debloquerTout }, "🔓 Tout débloquer d'un coup"));
   }
 
   function ligneEtape(e) {
