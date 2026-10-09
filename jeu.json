@@ -57,24 +57,19 @@
         "consigne": "Retrouve les 5 paires en moins de 15 secondes",
         "photos": [
           {
-            "image": "img/jeu/q2-1.jpg",
-            "legende": "12 mai 2026"
+            "image": "img/jeu/q2-1.jpg"
           },
           {
-            "image": "img/jeu/q2-2.jpg",
-            "legende": "8 mai 2026"
+            "image": "img/jeu/q2-2.jpg"
           },
           {
-            "image": "img/jeu/q2-3.jpg",
-            "legende": "8 mai 2026"
+            "image": "img/jeu/q2-3.jpg"
           },
           {
-            "image": "img/jeu/q2-4.jpg",
-            "legende": "10 mai 2026"
+            "image": "img/jeu/q2-4.jpg"
           },
           {
-            "image": "img/jeu/q2-5.jpg",
-            "legende": "10 mai 2026"
+            "image": "img/jeu/q2-5.jpg"
           }
         ],
         "secondes": 15
@@ -176,24 +171,19 @@
         "consigne": "Retrouve les 5 paires en moins de 15 secondes",
         "photos": [
           {
-            "image": "img/jeu/q5-1.jpg",
-            "legende": "8 mai 2026"
+            "image": "img/jeu/q5-1.jpg"
           },
           {
-            "image": "img/jeu/q5-2.jpg",
-            "legende": "8 mai 2026"
+            "image": "img/jeu/q5-2.jpg"
           },
           {
-            "image": "img/jeu/q5-3.jpg",
-            "legende": ""
+            "image": "img/jeu/q5-3.jpg"
           },
           {
-            "image": "img/jeu/q5-4.jpg",
-            "legende": ""
+            "image": "img/jeu/q5-4.jpg"
           },
           {
-            "image": "img/jeu/q5-5.jpg",
-            "legende": "15 août 2026"
+            "image": "img/jeu/q5-5.jpg"
           }
         ],
         "secondes": 15
