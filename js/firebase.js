@@ -63,9 +63,8 @@ export async function obtenirJeton(reg) {
 
 // ---------- Appareils ----------
 // Le compte est partagé : chaque iPhone a son propre identifiant et son propre
-// document appareils/{id}, avec un rôle. Les notifs du jeu partent vers les
-// appareils « joueuse » ; un appareil « admin » ne reçoit que les tests et
-// n'écrit jamais la progression.
+// document appareils/{id}, avec un rôle. Les notifs du jeu partent vers tous
+// les appareils ; un appareil « admin » n'écrit jamais la progression.
 const CLE_ID = "appareil-id";
 const CLE_ROLE = "appareil-role";
 

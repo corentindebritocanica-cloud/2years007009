@@ -210,7 +210,7 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
         h("h3", {}, "Cet appareil"),
         choixRole,
         h("p", { class: "doux" }, role === "admin"
-          ? "Admin : ne reçoit que les notifs de test, et l'accueil est en lecture seule (rien n'est enregistré à la place de Lisa)."
+          ? "Admin : reçoit aussi les notifs du jeu, mais l'accueil est en lecture seule (rien n'est enregistré à la place de Lisa)."
           : "Joueuse : reçoit les notifs du jeu, et sa progression est enregistrée. C'est le réglage de l'iPhone de Lisa."),
         h("p", { class: "discret" }, `Notifications ${permission}${fb.estInstallee() ? " · app installée" : " · ouvert dans le navigateur"}`),
         permission === "pas encore demandées" ? btnPerm : null),

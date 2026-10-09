@@ -146,12 +146,13 @@ function verifierJeton_(idToken) {
 }
 
 // ===================================================================== FCM
-// cible : 'joueuse' (tous les appareils joueuse), 'admin', ou { appareil: id }.
+// cible : 'tous', 'joueuse', 'admin', ou { appareil: id }.
 // Un jeton révoqué par iOS (UNREGISTERED / NOT_FOUND) est retiré de Firestore.
 function envoyerPush_(cible, data) {
   var appareils = listerAppareils_().filter(function (a) {
     if (!a.jeton) return false;
     if (cible && cible.appareil) return a.id === cible.appareil;
+    if (cible === 'tous') return true;
     return a.role === cible;
   });
   var vus = {};
@@ -195,10 +196,11 @@ function envoyerFcm_(jeton, data) {
   return { ok: false, erreur: statut || ('HTTP_' + code) };
 }
 
-// Mode test (propriété TEST_DEBUT) : les notifs du jeu partent vers les appareils
-// « admin » seulement, et aucun e-mail n'est envoyé à la joueuse. Elle ne voit rien.
+// Notifs du jeu : tous les appareils inscrits (Lisa ET l'admin).
+// Mode test (propriété TEST_DEBUT) : appareils « admin » seulement, et aucun
+// e-mail n'est envoyé à la joueuse. Elle ne voit rien.
 function modeTest_() { return !!prop_('TEST_DEBUT'); }
-function cibleJeu_() { return modeTest_() ? 'admin' : 'joueuse'; }
+function cibleJeu_() { return modeTest_() ? 'admin' : 'tous'; }
 
 function repliEmail_(n, erreur) {
   var lien = CONFIG.URL_APP + '?etape=' + n;
