@@ -270,8 +270,8 @@
         "cache": "Un message t'attend…"
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -298,8 +298,8 @@
         "revelation": "Évasion. Garde ce mot en tête…"
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -322,8 +322,8 @@
         "final": false
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -347,27 +347,31 @@
       "jeu": {
         "type": "choix",
         "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
-        "indice": "Indice pour éliminer — À REMPLIR",
+        "indice": "",
         "options": [
           {
             "id": "l1",
             "nom": "Paris",
-            "image": "img/jeu/leurre-1.svg"
+            "image": "img/jeu/leurre-1.svg",
+            "pourquoi": "parce que c'est la ville de l'amour"
           },
           {
             "id": "l2",
             "nom": "Lens",
-            "image": "img/jeu/leurre-2.svg"
+            "image": "img/jeu/leurre-2.svg",
+            "pourquoi": "pour te faire découvrir mes racines"
           },
           {
             "id": "l3",
             "nom": "Perpignan",
-            "image": "img/jeu/leurre-3.svg"
+            "image": "img/jeu/leurre-3.svg",
+            "pourquoi": "parce que j'ai pas assez d'argent"
           },
           {
             "id": "l4",
             "nom": "Pays basque",
-            "image": "img/jeu/leurre-4.svg"
+            "image": "img/jeu/leurre-4.svg",
+            "pourquoi": "parce que tu adores ça"
           }
         ],
         "elimine": "l1",
@@ -375,7 +379,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "Une chose que je peux te dire : ça va te dépayser."
       }
     },
     {
@@ -398,8 +402,8 @@
         "final": false
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -422,27 +426,31 @@
       "jeu": {
         "type": "choix",
         "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
-        "indice": "Indice pour éliminer — À REMPLIR",
+        "indice": "",
         "options": [
           {
             "id": "l1",
             "nom": "Paris",
-            "image": "img/jeu/leurre-1.svg"
+            "image": "img/jeu/leurre-1.svg",
+            "pourquoi": "parce que c'est la ville de l'amour"
           },
           {
             "id": "l2",
             "nom": "Lens",
-            "image": "img/jeu/leurre-2.svg"
+            "image": "img/jeu/leurre-2.svg",
+            "pourquoi": "pour te faire découvrir mes racines"
           },
           {
             "id": "l3",
             "nom": "Perpignan",
-            "image": "img/jeu/leurre-3.svg"
+            "image": "img/jeu/leurre-3.svg",
+            "pourquoi": "parce que j'ai pas assez d'argent"
           },
           {
             "id": "l4",
             "nom": "Pays basque",
-            "image": "img/jeu/leurre-4.svg"
+            "image": "img/jeu/leurre-4.svg",
+            "pourquoi": "parce que tu adores ça"
           }
         ],
         "elimine": "l2",
@@ -451,8 +459,8 @@
         ]
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -475,8 +483,8 @@
         "final": false
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -504,7 +512,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "Prévois un pull bien chaud. Et pas seulement à cause du froid… 🔥"
       }
     },
     {
@@ -522,27 +530,31 @@
       "jeu": {
         "type": "choix",
         "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
-        "indice": "Indice pour éliminer — À REMPLIR",
+        "indice": "",
         "options": [
           {
             "id": "l1",
             "nom": "Paris",
-            "image": "img/jeu/leurre-1.svg"
+            "image": "img/jeu/leurre-1.svg",
+            "pourquoi": "parce que c'est la ville de l'amour"
           },
           {
             "id": "l2",
             "nom": "Lens",
-            "image": "img/jeu/leurre-2.svg"
+            "image": "img/jeu/leurre-2.svg",
+            "pourquoi": "pour te faire découvrir mes racines"
           },
           {
             "id": "l3",
             "nom": "Perpignan",
-            "image": "img/jeu/leurre-3.svg"
+            "image": "img/jeu/leurre-3.svg",
+            "pourquoi": "parce que j'ai pas assez d'argent"
           },
           {
             "id": "l4",
             "nom": "Pays basque",
-            "image": "img/jeu/leurre-4.svg"
+            "image": "img/jeu/leurre-4.svg",
+            "pourquoi": "parce que tu adores ça"
           }
         ],
         "elimine": "l3",
@@ -552,8 +564,8 @@
         ]
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -578,8 +590,8 @@
         "image": "img/jeu/carte-2.svg"
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -603,8 +615,8 @@
         "ouverture": "Bravo ! Indice : glisse ton maillot de bain dans ta valise."
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -632,7 +644,7 @@
       },
       "recompense": {
         "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "texte": "Encore deux étapes avant de tout découvrir. Je ne dis rien de plus, mais j'ai hâte."
       }
     },
     {
@@ -654,8 +666,8 @@
         "taille": 3
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Bravo",
+        "texte": "Une étape de plus. 💛"
       }
     },
     {
@@ -683,8 +695,8 @@
         "nomLieu": "(révélé à la fin)"
       },
       "recompense": {
-        "titre": "Ta récompense",
-        "texte": "Texte de la récompense — À REMPLIR"
+        "titre": "Joyeux anniversaire",
+        "texte": "Deux ans, et j'ai tout prévu. Joyeux anniversaire mon amour 💛"
       }
     }
   ]

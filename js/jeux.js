@@ -473,11 +473,11 @@ function choix(zone, cfg, fini) {
       if (o.id === cfg.elimine) {
         liste.dataset.fini = "1";
         el.classList.add("eliminee");
-        msg.className = "message ok"; msg.textContent = "Bien vu. Ce n'est pas là.";
+        msg.className = "message ok"; msg.textContent = "Bien vu. Ce n'est pas là." + (o.pourquoi ? ` J'y avais pensé, ${o.pourquoi}.` : "");
         setTimeout(fini, 900);
       } else {
         el.classList.remove("non"); void el.offsetWidth; el.classList.add("non");
-        msg.className = "message erreur"; msg.textContent = "Non… celle-là reste en lice. Relis l'indice.";
+        msg.className = "message erreur"; msg.textContent = "Non… celle-là reste en lice. Essaie encore.";
         vibrer([20, 40, 20]);
       }
     });
