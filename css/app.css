@@ -271,6 +271,34 @@ html.page-figee, html.page-figee body { overscroll-behavior: none; }
   font-family: var(--display); font-size: 1.5rem; font-weight: 600; transition: transform 0.1s, opacity 0.2s; }
 .anag-lettre:active { transform: scale(0.92); }
 .anag-lettre.prise { opacity: 0.18; }
+.anag-reserve { max-height: 260px; transition: opacity 0.4s, max-height 0.6s, margin 0.6s; }
+.anag-reserve.vide { opacity: 0; max-height: 0; overflow: hidden; margin: -6px 0; }
+.anag-cases { perspective: 600px; }
+.anag-cases.vague .anag-case { animation: anag-flip 0.75s cubic-bezier(.3,1.4,.5,1) calc(var(--k) * 90ms) both; }
+.anag-cases.fusion { animation: anag-fusion 0.45s ease-in forwards; }
+.anag-revele { position: relative; text-align: center; padding: 14px 0 4px; font-family: var(--display); font-weight: 600;
+  font-size: clamp(2.4rem, 12.5vw, 3.6rem); letter-spacing: 0.08em; line-height: 1.1; }
+.anag-revele span:not(.anag-etincelle) { display: inline-block;
+  background: linear-gradient(100deg, var(--ambre) 15%, #fff6df 40%, var(--rose) 65%, var(--ambre) 90%); background-size: 300% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: anag-in 0.65s cubic-bezier(.2,1.5,.4,1) calc(var(--k) * 70ms) both, anag-brille 3.2s linear calc(0.9s + var(--k) * 90ms) infinite; }
+.anag-etincelle { position: absolute; left: 50%; top: 50%; font-size: 1.1rem; color: var(--ambre); pointer-events: none;
+  animation: anag-etincelle 1.2s ease-out forwards; }
+.anag-phrase { text-align: center; min-height: 1.6em; font-family: var(--display); font-style: italic; font-size: 1.25rem; color: var(--texte); }
+.anag-phrase::after { content: "▍"; margin-left: 2px; color: var(--ambre); animation: chrono-clign 0.8s steps(1) infinite; }
+@keyframes anag-flip {
+  0% { transform: none; }
+  45% { transform: translateY(-16px) rotateY(180deg) scale(1.18); }
+  100% { transform: rotateY(360deg); border-style: solid; border-color: var(--ambre); background: var(--ambre); color: var(--sur-ambre);
+    box-shadow: 0 0 22px rgba(243, 201, 139, 0.65); }
+}
+@keyframes anag-fusion { to { transform: scale(0.5); opacity: 0; filter: blur(5px); } }
+@keyframes anag-in { from { opacity: 0; transform: translateY(-46px) scale(1.9) rotate(-14deg); filter: blur(7px); } }
+@keyframes anag-brille { from { background-position: 100% 0; } to { background-position: -200% 0; } }
+@keyframes anag-etincelle {
+  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1) rotate(160deg); opacity: 0; }
+}
 
 /* Choix piège : cartes postales, tampon « ÉLIMINÉ » */
 .choix { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 6px 2px; }

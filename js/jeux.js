@@ -444,17 +444,56 @@ function anagramme(zone, cfg, fini) {
   function verifier() {
     const essai = placees.map((i) => ordre[i].c).join("");
     if (essai === lettres.join("")) {
-      cases.classList.add("ok");
       [...reserve.children].forEach((b) => { b.disabled = true; });
       effacer.remove();
-      msg.className = "message ok"; msg.textContent = cfg.revelation || "Bravo !";
-      setTimeout(fini, 700);
+      msg.textContent = "";
+      reveler();
     } else {
       msg.className = "message erreur"; msg.textContent = "Presque… réessaie.";
       cases.classList.remove("secoue"); void cases.offsetWidth; cases.classList.add("secoue");
       vibrer([30, 50, 30]);
     }
   }
+  // Révélation : vague de lettres dorées → le mot en grand → la phrase s'écrit.
+  function reveler() {
+    const sans = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    const rev = String(cfg.revelation || "");
+    const m = rev.match(/^\s*([^.!?…]+)[.!?…]*\s*(.*)$/s);
+    const affiche = m && sans(m[1]).replace(/\s/g, "") === lettres.join("") ? m[1].trim().toUpperCase() : mot;
+    const suite = m && affiche !== mot ? m[2] : rev;
+    const n = lettres.length;
+    [...cases.children].forEach((c, k) => c.style.setProperty("--k", k));
+    cases.classList.add("ok", "vague");
+    reserve.classList.add("vide");
+    lettres.forEach((_, k) => setTimeout(() => vibrer(8), k * 90 + 250));
+    setTimeout(() => {
+      cases.classList.add("fusion");
+      setTimeout(() => {
+        const grand = h("div", { class: "anag-revele", "aria-label": affiche },
+          [...affiche].map((c, k) => h("span", { style: `--k:${k}` }, c === " " ? "\u00a0" : c)));
+        cases.replaceWith(grand);
+        vibrer([60, 40, 120]);
+        setTimeout(() => {
+          confettis();
+          for (let k = 0; k < 18; k++) {
+            const a = (Math.PI * 2 * k) / 18, d = 80 + Math.random() * 70;
+            const e = h("span", { class: "anag-etincelle", style: `--dx:${Math.cos(a) * d * 1.6}px;--dy:${Math.sin(a) * d}px;animation-delay:${Math.random() * 0.15}s` }, "✦");
+            grand.append(e); setTimeout(() => e.remove(), 1400);
+          }
+        }, affiche.length * 70 + 300);
+        // la phrase s'écrit lettre par lettre
+        msg.className = "anag-phrase";
+        const texte = suite || "Bravo !";
+        let i = 0;
+        setTimeout(function taper() {
+          msg.textContent = texte.slice(0, ++i);
+          if (i < texte.length) setTimeout(taper, 45);
+          else setTimeout(fini, 900);
+        }, affiche.length * 70 + 1100);
+      }, 450);
+    }, n * 90 + 900);
+  }
+
   effacer.addEventListener("click", () => { placees.length = 0; msg.textContent = ""; dessiner(); });
   dessiner();
 }
