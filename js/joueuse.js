@@ -193,8 +193,11 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       requestAnimationFrame(() => son.classList.add("visible"));
     });
     video.addEventListener("play", () => { lecture.remove(); video.controls = true; });
-    const fin = h("button", { class: "btn plein" }, "Je suis prête ✨");
-    video.addEventListener("ended", () => { fin.classList.add("ba-pulse"); vibrer([20, 30, 50]); });
+    // « Je suis prête » n'apparaît qu'à la fin de la vidéo (ou si elle ne peut pas se lire).
+    const fin = h("button", { class: "btn plein ba-fin" }, "Je suis prête ✨");
+    const montrerFin = () => { fin.classList.add("visible", "ba-pulse"); vibrer([20, 30, 50]); };
+    video.addEventListener("ended", montrerFin);
+    video.addEventListener("error", montrerFin);
     const fermer = () => {
       if (!testBandeAnnonce) try { localStorage.setItem("bande-annonce-vue", "1"); } catch { /* rien */ }
       video.pause();

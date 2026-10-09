@@ -717,3 +717,5 @@ html.page-figee, html.page-figee body { overscroll-behavior: none; }
 .ba-son-boite h2 { margin: 0; }
 .ba-son-icone { font-size: 3.2rem; line-height: 1; animation: ba-son 1s ease-in-out infinite; }
 @keyframes ba-son { 50% { transform: scale(1.15) rotate(-6deg); } }
+.ba-fin { visibility: hidden; opacity: 0; transform: translateY(12px); transition: opacity 0.5s, transform 0.5s cubic-bezier(.2,1.3,.4,1); }
+.ba-fin.visible { visibility: visible; opacity: 1; transform: none; }
