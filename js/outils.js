@@ -51,6 +51,52 @@ export function vibrer(motif) {
   } catch { /* sans effet */ }
 }
 
+// Retour tactile sur TOUS les boutons de l'app : onde à l'endroit du doigt + tic haptique.
+let retourActif = false;
+export function activerRetourBoutons() {
+  if (retourActif) return; retourActif = true;
+  document.addEventListener("pointerdown", (e) => {
+    const b = e.target.closest?.("button, a.btn");
+    if (!b || b.disabled) return;
+    vibrer(8);
+    const r = b.getBoundingClientRect();
+    const t = Math.max(r.width, r.height) * 2.2;
+    const o = document.createElement("span");
+    o.className = "onde-tap"; o.setAttribute("aria-hidden", "true");
+    o.style.cssText = `width:${t}px;height:${t}px;left:${e.clientX - r.left - t / 2}px;top:${e.clientY - r.top - t / 2}px`;
+    b.append(o);
+    setTimeout(() => o.remove(), 650);
+  }, { capture: true, passive: true });
+}
+
+// Petit message en bas de l'écran. type : "ok" | "ko" | "info".
+export function toast(texte, type = "ok") {
+  document.querySelectorAll(".toast").forEach((t) => t.remove());
+  const el = h("div", { class: `toast ${type}`, role: "status", "aria-live": "polite" },
+    h("span", { class: "toast-icone" }, type === "ko" ? "!" : type === "info" ? "i" : "✓"), h("span", {}, texte));
+  document.body.append(el);
+  if (type === "ko") vibrer([30, 50, 30]);
+  setTimeout(() => el.classList.add("sort"), type === "ko" ? 4200 : 2400);
+  setTimeout(() => el.remove(), type === "ko" ? 4600 : 2800);
+}
+
+// Bouton d'action asynchrone : sablier pendant l'action, puis ✓ vert ou ✕ rouge.
+// `action` peut renvoyer false (annulé par l'utilisateur) : le bouton revient alors simplement à l'état normal.
+export async function agir(bouton, action) {
+  const b = bouton instanceof Event ? bouton.currentTarget : bouton;
+  const marquer = (cls) => { if (!b?.isConnected) return; b.classList.add(cls); setTimeout(() => b.classList.remove(cls), 1400); };
+  if (b) { b.classList.add("charge"); b.disabled = true; }
+  try {
+    const r = await action();
+    if (r !== false) { marquer("reussi"); vibrer([15, 30, 40]); }
+    return r;
+  } catch (err) {
+    console.error(err); marquer("echec"); toast(err?.message || String(err), "ko");
+  } finally {
+    if (b) { b.classList.remove("charge"); b.disabled = false; }
+  }
+}
+
 // Gerbe d'étincelles autour de (x, y) dans `parent` (qui doit être positionné).
 export function eclat(parent, x, y, { n = 14, symbole = "✦", distance = 90, couleur = "var(--ambre)", taille = "1.1rem" } = {}) {
   for (let k = 0; k < n; k++) {

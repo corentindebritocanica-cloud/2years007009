@@ -1,6 +1,7 @@
 // Point d'entrée : connexion unique et persistante, puis routage selon le rôle
 // (joueuse → le jeu, admin → le tableau de bord, qui peut aussi prévisualiser le jeu).
-import { h, estIOS, tutoInstallation } from "./outils.js";
+import { h, estIOS, tutoInstallation, activerRetourBoutons } from "./outils.js";
+activerRetourBoutons();
 
 const racine = document.getElementById("app");
 const chargement = () => racine.replaceChildren(h("div", { class: "chargement" }, h("div", { class: "point" })));

@@ -1,6 +1,6 @@
 // Tableau de bord admin : suivi des 21 étapes, réponses de Lisa, journal du relais,
 // déblocage manuel (étape 21 et secours), notifications de test, aperçu du jeu.
-import { h, dateParis, dateCourte, toDate } from "./outils.js";
+import { h, dateParis, dateCourte, toDate, toast, agir } from "./outils.js";
 import { RELAIS_URL } from "./config.js";
 import { verrouillerAdmin } from "./code.js";
 import { demarrerJeu } from "./joueuse.js";
@@ -40,49 +40,51 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
     return d;
   }
 
-  async function debloquer(n) {
+  function debloquer(n, ev) {
     if (!confirm(`Débloquer l'étape ${n} maintenant ?${RELAIS_URL ? " Une notification partira." : "\n(Relais non configuré : aucune notification.)"}`)) return;
-    try {
+    return agir(ev, async () => {
       if (RELAIS_URL) {
         await relais("debloquer", { etape: n });
       } else {
         await fs.setDoc(fs.doc(db, "etapes", String(n)), { debloqueeA: fs.serverTimestamp(), mode: "manuel" });
       }
       toast(`Étape ${n} débloquée`);
-    } catch (e) { alert(e.message); }
+    });
   }
 
   // Ouvre d'un coup toutes les étapes pas encore ouvertes (sans notification). Pour tester ou en secours.
-  async function debloquerTout() {
+  function debloquerTout(ev) {
     const restantes = jeu.etapes.filter((e) => !etat.etapes[e.n]);
-    if (!restantes.length) { toast("Toutes les étapes sont déjà ouvertes"); return; }
+    if (!restantes.length) { toast("Toutes les étapes sont déjà ouvertes", "info"); return; }
     if (!confirm(`Débloquer les ${restantes.length} étapes restantes d'un coup ? Aucune notification ne part, et Lisa pourra tout jouer immédiatement.`)) return;
-    if (prompt("Tape TOUT pour confirmer") !== "TOUT") return;
-    try {
+    if (prompt("Tape TOUT pour confirmer") !== "TOUT") { toast("Annulé : rien n'a été débloqué", "info"); return; }
+    return agir(ev, async () => {
       const lot = fs.writeBatch(db);
       restantes.forEach((e) => lot.set(fs.doc(db, "etapes", String(e.n)), { debloqueeA: fs.serverTimestamp(), mode: "manuel" }));
       await lot.commit();
       toast(`${restantes.length} étapes débloquées`);
-    } catch (e) { alert(e.message); }
+    });
   }
 
-  async function notifTest(cible) {
-    try {
+  function notifTest(cible, ev) {
+    return agir(ev, async () => {
       const d = await relais("test", { cible, appareil: fb.idAppareil() });
       toast(d.message || "Notification envoyée");
-    } catch (e) { alert(e.message); }
+    });
   }
 
-  async function reinitialiser() {
+  function reinitialiser(ev) {
     if (!confirm("Effacer TOUTE la progression, les réponses et les déblocages ? (pour repartir de zéro après les tests)")) return;
-    if (prompt("Tape EFFACER pour confirmer") !== "EFFACER") return;
-    const lot = fs.writeBatch(db);
-    for (const col of ["etapes", "progression", "reponses"]) {
-      const s = await fs.getDocs(fs.collection(db, col));
-      s.forEach((d) => lot.delete(d.ref));
-    }
-    await lot.commit();
-    toast("Données de jeu remises à zéro");
+    if (prompt("Tape EFFACER pour confirmer") !== "EFFACER") { toast("Annulé : rien n'a été effacé", "info"); return; }
+    return agir(ev, async () => {
+      const lot = fs.writeBatch(db);
+      for (const col of ["etapes", "progression", "reponses"]) {
+        const s = await fs.getDocs(fs.collection(db, col));
+        s.forEach((d) => lot.delete(d.ref));
+      }
+      await lot.commit();
+      toast("Données de jeu remises à zéro");
+    });
   }
 
   function apercu(n) {
@@ -92,11 +94,6 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
       apercu: true,
       quitter: () => { sousVue?.(); sousVue = null; history.replaceState(null, "", location.pathname); demarrerAdmin(racine, fb, jeu, user, { retour }); },
     });
-  }
-
-  function toast(t) {
-    const el = h("div", { class: "bandeau", style: "position:fixed;left:16px;right:16px;bottom:calc(var(--sb) + 16px);z-index:60;box-shadow:var(--ombre)" }, t);
-    document.body.append(el); setTimeout(() => el.remove(), 2600);
   }
 
   // ---------- Rendu ----------
@@ -152,7 +149,7 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
         h("div", { class: "discret" }, e.manuel ? `${e.date} · manuel` : `${dateCourte(prevue)}`),
         h("div", { class: "etats" }, etats)),
       h("div", { class: "pile", style: "gap:6px" },
-        s ? null : h("button", { class: "btn petit", onclick: () => debloquer(e.n) }, "Débloquer"),
+        s ? null : h("button", { class: "btn petit", onclick: (ev) => debloquer(e.n, ev) }, "Débloquer"),
         h("button", { class: "btn secondaire petit", onclick: () => apercu(e.n) }, "Voir")));
   }
 
@@ -176,9 +173,9 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
         j.detail ? h("code", {}, typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail)) : null)));
   }
 
-  async function oublierAppareil(id) {
+  function oublierAppareil(id, ev) {
     if (!confirm("Retirer cet appareil ? Il ne recevra plus de notifications jusqu'à sa prochaine ouverture de l'app.")) return;
-    await fs.deleteDoc(fs.doc(db, "appareils", id)).catch((e) => alert(e.message));
+    return agir(ev, async () => { await fs.deleteDoc(fs.doc(db, "appareils", id)); toast("Appareil retiré"); });
   }
 
   function vueReglages() {
@@ -188,20 +185,24 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
       .sort(([a], [b]) => (a === ici ? -1 : b === ici ? 1 : 0));
     const permission = fb.pushPossible() ? { granted: "autorisées", denied: "refusées", default: "pas encore demandées" }[Notification.permission] : "indisponibles";
     const btnPerm = h("button", { class: "btn secondaire plein" }, "Activer les notifications sur cet appareil");
-    btnPerm.addEventListener("click", async () => {
+    btnPerm.addEventListener("click", (ev) => agir(ev, async () => {
       const p = await Notification.requestPermission();
-      if (p === "granted") { await fb.synchroniserAppareil(true).catch((e) => alert(e.message)); toast("Appareil inscrit"); }
+      if (p !== "granted") { toast("Notifications refusées", "ko"); rendre(); return false; }
+      await fb.synchroniserAppareil(true);
+      toast("Appareil inscrit");
       rendre();
-    });
+    }));
 
     const choixRole = h("div", { class: "onglets", style: "position:static" },
       [["joueuse", "Joueuse"], ["admin", "Admin"]].map(([v, nom]) => h("button", {
         class: role === v ? "actif" : "",
-        onclick: async () => {
+        onclick: (ev) => {
           if (v === role) return;
-          await fb.changerRoleAppareil(v).catch((e) => alert(e.message));
-          toast(v === "admin" ? "Cet appareil est maintenant « admin »" : "Cet appareil est maintenant « joueuse »");
-          rendre();
+          return agir(ev, async () => {
+            await fb.changerRoleAppareil(v);
+            toast(v === "admin" ? "Cet appareil est maintenant « admin »" : "Cet appareil est maintenant « joueuse »");
+            rendre();
+          });
         },
       }, nom)));
 
@@ -220,14 +221,14 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
           h("div", { class: "ligne" },
             h("strong", {}, `${a.role === "admin" ? "Admin" : "Joueuse"}${id === ici ? " · cet appareil" : ""}`),
             h("span", { class: "espace" }),
-            h("button", { class: "btn fantome petit", onclick: () => oublierAppareil(id) }, "Retirer")),
+            h("button", { class: "btn fantome petit", onclick: (ev) => oublierAppareil(id, ev) }, "Retirer")),
           h("div", { class: "discret" }, `màj ${dateCourte(toDate(a.majA))}${a.jeton ? "" : " · pas de notifications"}`),
           h("code", {}, (a.appareil || "").slice(0, 90)))) : h("p", { class: "doux" }, "Aucun appareil inscrit.")),
       h("section", { class: "carte pile" },
         h("h3", {}, "Notifications de test"),
         h("p", { class: "doux" }, "Passe par le relais Apps Script, comme les vraies."),
-        h("button", { class: "btn secondaire plein", onclick: () => notifTest("appareil") }, "Tester sur cet appareil"),
-        h("button", { class: "btn secondaire plein", onclick: () => notifTest("joueuse") }, "Tester sur les appareils « joueuse »")),
+        h("button", { class: "btn secondaire plein", onclick: (ev) => notifTest("appareil", ev) }, "Tester sur cet appareil"),
+        h("button", { class: "btn secondaire plein", onclick: (ev) => notifTest("joueuse", ev) }, "Tester sur les appareils « joueuse »")),
       h("section", { class: "carte pile" },
         h("h3", {}, "Tests"),
         h("p", { class: "doux" }, "Avant le lancement : remet le jeu à zéro (étapes, progression, réponses)."),
