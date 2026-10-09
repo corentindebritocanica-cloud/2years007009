@@ -2,7 +2,7 @@
  * Règle d'or iOS : chaque push reçu DOIT afficher une notification,
  * sinon Safari révoque l'abonnement après 3 push « silencieux ».
  */
-const CACHE = "jeu-v16";
+const CACHE = "jeu-v17";
 const COQUILLE = ["./", "./index.html", "./css/app.css", "./manifest.json", "./img/icone-192.png"];
 
 self.addEventListener("install", (e) => {

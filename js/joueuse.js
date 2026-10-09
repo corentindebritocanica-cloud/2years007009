@@ -167,18 +167,22 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
   // baEtat : null (pas encore montrée) → "encours" → "finie". Les données Firestore peuvent
   // redessiner l'accueil pendant la vidéo : on ne doit alors RIEN ouvrir par-dessus.
   let baEtat = null;
-  function proposerBandeAnnonce(ensuite) {
-    if (baEtat === "encours") return;
-    if (baEtat === "finie") return ensuite();
-    let deja = false;
-    try { deja = deja || !!localStorage.getItem("bande-annonce-vue"); } catch { /* rien */ }
-    if ((!testBandeAnnonce && (apercu || deja)) || !BANDE_ANNONCE) { baEtat = "finie"; return ensuite(); }
-    baEtat = "encours";
+  // revoir = true : relancée depuis le bouton du bas de l'accueil (fermable à tout moment).
+  function proposerBandeAnnonce(ensuite, revoir = false) {
+    if (!revoir) {
+      if (baEtat === "encours") return;
+      if (baEtat === "finie") return ensuite();
+      let deja = false;
+      try { deja = !!localStorage.getItem("bande-annonce-vue"); } catch { /* rien */ }
+      if ((!testBandeAnnonce && (apercu || deja)) || !BANDE_ANNONCE) { baEtat = "finie"; return ensuite(); }
+      baEtat = "encours";
+    } else if (document.querySelector(".ba-voile")) return;
     const video = h("video", { src: BANDE_ANNONCE, poster: "video/affiche.jpg", playsinline: true, "webkit-playsinline": true, preload: "auto" });
     const lecture = h("button", { class: "ba-lecture", "aria-label": "Lancer la bande-annonce" }, "▶");
     // Avant la lecture : pop-up « monte le son » au centre, la vidéo part depuis son bouton.
     lecture.addEventListener("click", () => {
       if (voile.querySelector(".ba-son")) return; // double appui
+      if (revoir) { video.muted = false; video.play().catch(() => {}); return; }
       vibrer(15);
       const ok = h("button", { class: "btn plein" }, "C'est fait, lance !");
       const son = h("div", { class: "ba-son", role: "alertdialog", "aria-labelledby": "ba-son-titre" },
@@ -198,7 +202,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
     });
     video.addEventListener("play", () => { lecture.remove(); video.controls = true; });
     // « Je suis prête » n'apparaît qu'à la fin de la vidéo (ou si elle ne peut pas se lire).
-    const fin = h("button", { class: "btn plein ba-fin" }, "Je suis prête ✨");
+    const fin = h("button", { class: `btn plein ba-fin${revoir ? " visible" : ""}` }, revoir ? "Fermer" : "Je suis prête ✨");
     const montrerFin = () => { fin.classList.add("visible", "ba-pulse"); vibrer([20, 30, 50]); };
     video.addEventListener("ended", montrerFin);
     video.addEventListener("error", montrerFin);
@@ -206,11 +210,11 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       if (!testBandeAnnonce) try { localStorage.setItem("bande-annonce-vue", "1"); } catch { /* rien */ }
       video.pause();
       voile.classList.remove("visible");
-      setTimeout(() => { voile.remove(); baEtat = "finie"; ensuite(); }, 350);
+      setTimeout(() => { voile.remove(); if (!revoir) { baEtat = "finie"; ensuite(); } }, 350);
     };
     fin.addEventListener("click", fermer);
     const voile = h("div", { class: "ba-voile", role: "dialog", "aria-modal": "true", "aria-label": "Bande-annonce" },
-      h("span", { class: "surtitre" }, "Avant de commencer"),
+      h("span", { class: "surtitre" }, revoir ? "Bande-annonce" : "Avant de commencer"),
       h("div", { class: "ba-cadre" }, video, lecture), fin);
     document.body.append(voile);
     requestAnimationFrame(() => voile.classList.add("visible"));
@@ -260,7 +264,10 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       if (!ouvrirAdmin) return;
       if (await demanderCode()) ouvrirAdmin();
     });
-    return h("footer", { class: "pied" }, logo,
+    const revoir = BANDE_ANNONCE
+      ? h("button", { class: "btn fantome petit", onclick: () => proposerBandeAnnonce(() => {}, true) }, "🎬 Revoir la bande-annonce")
+      : null;
+    return h("footer", { class: "pied" }, revoir, logo,
       lectureSeule ? h("p", { class: "discret" }, "Appareil admin · tes actions ici ne sont pas enregistrées") : null);
   }
 
