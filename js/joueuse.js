@@ -159,6 +159,42 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       jauge,
       h("section", { class: "pile" }, h("span", { class: "surtitre" }, "Le chemin"), grille),
       apercu ? null : piedDePage()));
+    proposerNotifications();
+  }
+
+  // Pop-up unique après la connexion dans l'app installée. iOS exige un appui
+  // pour demander l'autorisation : on la demande depuis le bouton de la pop-up.
+  let notifProposee = false;
+  function proposerNotifications() {
+    if (apercu || notifProposee || !fb.pushPossible() || Notification.permission !== "default") return;
+    try { if (sessionStorage.getItem("notif-plus-tard")) return; } catch { /* rien */ }
+    notifProposee = true;
+    const msg = h("p", { class: "message" });
+    const oui = h("button", { class: "btn plein" }, "Activer les notifications");
+    const non = h("button", { class: "btn fantome" }, "Plus tard");
+    const voile = h("div", { class: "pop-voile", role: "dialog", "aria-modal": "true", "aria-labelledby": "pop-titre" },
+      h("div", { class: "pop-boite pile" },
+        h("div", { class: "pop-cloche", "aria-hidden": "true" }, "🔔"),
+        h("h2", { id: "pop-titre" }, "Je te préviens ?"),
+        h("p", { class: "doux" }, "Une nouvelle étape s'ouvre tous les 3 jours, le soir. Autorise les notifications pour ne jamais en rater une."),
+        h("div", { class: "pop-exemple", "aria-hidden": "true" },
+          h("img", { src: "img/icone-192.png", alt: "" }),
+          h("div", {}, h("strong", {}, jeu.meta?.notif?.titre || "Une nouvelle étape t'attend"), h("span", {}, jeu.meta?.notif?.texte || "Ouvre l'app quand tu es prête ✨"))),
+        oui, msg, non));
+    const fermer = () => { voile.classList.remove("visible"); setTimeout(() => voile.remove(), 300); };
+    oui.addEventListener("click", async () => {
+      oui.disabled = true;
+      const p = await Notification.requestPermission();
+      if (p === "granted") {
+        try { await fb.synchroniserAppareil(true); } catch (e) { console.error(e); }
+        voile.querySelector(".pop-cloche").textContent = "✅";
+        voile.querySelector("#pop-titre").textContent = "C'est tout bon !";
+        vibrer([20, 30, 50]);
+        setTimeout(() => { fermer(); rendre(); }, 1100);
+      } else { fermer(); rendre(); }
+    });
+    non.addEventListener("click", () => { try { sessionStorage.setItem("notif-plus-tard", "1"); } catch { /* rien */ } fermer(); });
+    setTimeout(() => { document.body.append(voile); requestAnimationFrame(() => voile.classList.add("visible")); }, 900);
   }
 
   // Logo en bas de l'accueil : ouvre le pavé à code, puis l'espace admin.
