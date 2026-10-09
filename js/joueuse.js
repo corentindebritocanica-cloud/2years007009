@@ -164,17 +164,21 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
   }
 
   // Bande-annonce (vidéo du dépôt) : une seule fois par appareil, juste après la première connexion.
-  let baVue = false;
+  // baEtat : null (pas encore montrée) → "encours" → "finie". Les données Firestore peuvent
+  // redessiner l'accueil pendant la vidéo : on ne doit alors RIEN ouvrir par-dessus.
+  let baEtat = null;
   function proposerBandeAnnonce(ensuite) {
-    let deja = baVue;
+    if (baEtat === "encours") return;
+    if (baEtat === "finie") return ensuite();
+    let deja = false;
     try { deja = deja || !!localStorage.getItem("bande-annonce-vue"); } catch { /* rien */ }
-    if (!testBandeAnnonce && (apercu || deja)) return ensuite();
-    if (!BANDE_ANNONCE) return ensuite();
-    baVue = true;
+    if ((!testBandeAnnonce && (apercu || deja)) || !BANDE_ANNONCE) { baEtat = "finie"; return ensuite(); }
+    baEtat = "encours";
     const video = h("video", { src: BANDE_ANNONCE, poster: "video/affiche.jpg", playsinline: true, "webkit-playsinline": true, preload: "auto" });
     const lecture = h("button", { class: "ba-lecture", "aria-label": "Lancer la bande-annonce" }, "▶");
     // Avant la lecture : pop-up « monte le son » au centre, la vidéo part depuis son bouton.
     lecture.addEventListener("click", () => {
+      if (voile.querySelector(".ba-son")) return; // double appui
       vibrer(15);
       const ok = h("button", { class: "btn plein" }, "C'est fait, lance !");
       const son = h("div", { class: "ba-son", role: "alertdialog", "aria-labelledby": "ba-son-titre" },
@@ -202,7 +206,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       if (!testBandeAnnonce) try { localStorage.setItem("bande-annonce-vue", "1"); } catch { /* rien */ }
       video.pause();
       voile.classList.remove("visible");
-      setTimeout(() => { voile.remove(); ensuite(); }, 350);
+      setTimeout(() => { voile.remove(); baEtat = "finie"; ensuite(); }, 350);
     };
     fin.addEventListener("click", fermer);
     const voile = h("div", { class: "ba-voile", role: "dialog", "aria-modal": "true", "aria-label": "Bande-annonce" },
@@ -236,7 +240,8 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       oui.disabled = true;
       const p = await Notification.requestPermission();
       if (p === "granted") {
-        try { await fb.synchroniserAppareil(true); } catch (e) { console.error(e); }
+        try { await fb.synchroniserAppareil(true); }
+        catch (e) { console.error(e); setTimeout(() => fb.synchroniserAppareil(true).catch(console.error), 4000); }
         voile.querySelector(".pop-cloche").textContent = "✅";
         voile.querySelector("#pop-titre").textContent = "C'est tout bon !";
         vibrer([20, 30, 50]);
