@@ -163,30 +163,31 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
     proposerBandeAnnonce(proposerNotifications);
   }
 
-  // Bande-annonce YouTube : une seule fois par appareil, juste après la première connexion.
+  // Bande-annonce (vidéo du dépôt) : une seule fois par appareil, juste après la première connexion.
   let baVue = false;
   function proposerBandeAnnonce(ensuite) {
-    const id = idYouTube(BANDE_ANNONCE);
     let deja = baVue;
     try { deja = deja || !!localStorage.getItem("bande-annonce-vue"); } catch { /* rien */ }
-    if (apercu || !id || deja) return ensuite();
+    if (apercu || !BANDE_ANNONCE || deja) return ensuite();
     baVue = true;
-    const src = `https://www.youtube-nocookie.com/embed/${id}?playsinline=1&rel=0&modestbranding=1&autoplay=1`;
+    const video = h("video", { src: BANDE_ANNONCE, poster: "video/affiche.jpg", playsinline: true, "webkit-playsinline": true, controls: true, preload: "auto" });
+    const lecture = h("button", { class: "ba-lecture", "aria-label": "Lancer la bande-annonce" }, "▶");
+    lecture.addEventListener("click", () => { lecture.remove(); video.play().catch(() => {}); });
+    video.addEventListener("play", () => lecture.remove());
+    const fin = h("button", { class: "btn plein" }, "Je suis prête ✨");
+    video.addEventListener("ended", () => { fin.classList.add("ba-pulse"); vibrer([20, 30, 50]); });
     const fermer = () => {
       try { localStorage.setItem("bande-annonce-vue", "1"); } catch { /* rien */ }
+      video.pause();
       voile.classList.remove("visible");
       setTimeout(() => { voile.remove(); ensuite(); }, 350);
     };
+    fin.addEventListener("click", fermer);
     const voile = h("div", { class: "ba-voile", role: "dialog", "aria-modal": "true", "aria-label": "Bande-annonce" },
       h("span", { class: "surtitre" }, "Avant de commencer"),
-      h("div", { class: "ba-cadre" }, h("iframe", { src, title: "Bande-annonce", allow: "autoplay; encrypted-media; picture-in-picture; fullscreen", allowfullscreen: "" })),
-      h("button", { class: "btn plein", onclick: fermer }, "Je suis prête ✨"));
+      h("div", { class: "ba-cadre" }, video, lecture), fin);
     document.body.append(voile);
     requestAnimationFrame(() => voile.classList.add("visible"));
-  }
-  function idYouTube(u) {
-    const m = String(u || "").trim().match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/) || String(u || "").trim().match(/^([\w-]{11})$/);
-    return m ? m[1] : "";
   }
 
   // Pop-up unique après la connexion dans l'app installée. iOS exige un appui

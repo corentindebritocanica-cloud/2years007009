@@ -31,6 +31,6 @@ export const RELAIS_URL = "https://script.google.com/macros/s/AKfycbzYvy5ucqeMoD
 // Laisser vide = clé par défaut de Firebase, qui fonctionne aussi.
 export const VAPID_KEY = "";
 
-// Lien YouTube de la bande-annonce (watch, youtu.be ou shorts). Montrée une seule
-// fois par appareil après la connexion. Vide = pas de bande-annonce.
-export const BANDE_ANNONCE = "";
+// Bande-annonce hébergée dans le dépôt (dossier video/). Montrée une seule fois
+// par appareil après la connexion. Vide = pas de bande-annonce.
+export const BANDE_ANNONCE = "video/bande-annonce.mp4";
