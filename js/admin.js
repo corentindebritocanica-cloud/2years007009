@@ -87,6 +87,15 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
     });
   }
 
+  // Simule l'arrivée après la connexion : accueil + bande-annonce, sans rien enregistrer.
+  function testBandeAnnonce() {
+    desabos.forEach((f) => f()); desabos.length = 0;
+    sousVue = demarrerJeu(racine, fb, jeu, user, {
+      apercu: true, testBandeAnnonce: true,
+      quitter: () => { sousVue?.(); sousVue = null; demarrerAdmin(racine, fb, jeu, user, { retour }); },
+    });
+  }
+
   function apercu(n) {
     desabos.forEach((f) => f()); desabos.length = 0;
     if (n) history.replaceState(null, "", `?etape=${n}`);
@@ -231,6 +240,8 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
         h("button", { class: "btn secondaire plein", onclick: (ev) => notifTest("joueuse", ev) }, "Tester sur les appareils « joueuse »")),
       h("section", { class: "carte pile" },
         h("h3", {}, "Tests"),
+        h("button", { class: "btn secondaire plein", onclick: testBandeAnnonce }, "🎬 Tester la bande-annonce"),
+        h("p", { class: "discret" }, "Comme après la connexion de Lisa. Ne compte pas comme « vue »."),
         h("p", { class: "doux" }, "Avant le lancement : remet le jeu à zéro (étapes, progression, réponses)."),
         h("button", { class: "btn danger plein", onclick: reinitialiser }, "Remettre le jeu à zéro")),
       h("section", { class: "carte pile" },

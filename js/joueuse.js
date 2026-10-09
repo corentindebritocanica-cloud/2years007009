@@ -9,7 +9,7 @@ import { lancerJeu } from "./jeux.js";
 import { demanderCode } from "./code.js";
 import { BANDE_ANNONCE } from "./config.js";
 
-export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeule = false, quitter, ouvrirAdmin } = {}) {
+export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeule = false, quitter, ouvrirAdmin, testBandeAnnonce = false } = {}) {
   const { db, fs } = fb;
   const N = jeu.etapes.length;
   const etat = { ouvertes: new Map(), prog: {}, pret: { e: false, p: false } };
@@ -168,16 +168,35 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
   function proposerBandeAnnonce(ensuite) {
     let deja = baVue;
     try { deja = deja || !!localStorage.getItem("bande-annonce-vue"); } catch { /* rien */ }
-    if (apercu || !BANDE_ANNONCE || deja) return ensuite();
+    if (!testBandeAnnonce && (apercu || deja)) return ensuite();
+    if (!BANDE_ANNONCE) return ensuite();
     baVue = true;
-    const video = h("video", { src: BANDE_ANNONCE, poster: "video/affiche.jpg", playsinline: true, "webkit-playsinline": true, controls: true, preload: "auto" });
+    const video = h("video", { src: BANDE_ANNONCE, poster: "video/affiche.jpg", playsinline: true, "webkit-playsinline": true, preload: "auto" });
     const lecture = h("button", { class: "ba-lecture", "aria-label": "Lancer la bande-annonce" }, "▶");
-    lecture.addEventListener("click", () => { lecture.remove(); video.play().catch(() => {}); });
-    video.addEventListener("play", () => lecture.remove());
+    // Avant la lecture : pop-up « monte le son » au centre, la vidéo part depuis son bouton.
+    lecture.addEventListener("click", () => {
+      vibrer(15);
+      const ok = h("button", { class: "btn plein" }, "C'est fait, lance !");
+      const son = h("div", { class: "ba-son", role: "alertdialog", "aria-labelledby": "ba-son-titre" },
+        h("div", { class: "ba-son-boite pile" },
+          h("div", { class: "ba-son-icone", "aria-hidden": "true" }, "🔊"),
+          h("h2", { id: "ba-son-titre" }, "Monte le son !"),
+          h("p", { class: "doux" }, "Cette vidéo se regarde avec le son : monte le volume de ton iPhone avec les boutons sur le côté."),
+          ok));
+      ok.addEventListener("click", () => {
+        son.classList.remove("visible");
+        setTimeout(() => son.remove(), 250);
+        video.muted = false;
+        video.play().catch(() => {});
+      });
+      voile.append(son);
+      requestAnimationFrame(() => son.classList.add("visible"));
+    });
+    video.addEventListener("play", () => { lecture.remove(); video.controls = true; });
     const fin = h("button", { class: "btn plein" }, "Je suis prête ✨");
     video.addEventListener("ended", () => { fin.classList.add("ba-pulse"); vibrer([20, 30, 50]); });
     const fermer = () => {
-      try { localStorage.setItem("bande-annonce-vue", "1"); } catch { /* rien */ }
+      if (!testBandeAnnonce) try { localStorage.setItem("bande-annonce-vue", "1"); } catch { /* rien */ }
       video.pause();
       voile.classList.remove("visible");
       setTimeout(() => { voile.remove(); ensuite(); }, 350);

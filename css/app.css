@@ -708,3 +708,12 @@ html.page-figee, html.page-figee body { overscroll-behavior: none; }
   background: rgba(243, 201, 139, 0.92); color: #2a160c; box-shadow: 0 10px 40px rgba(232, 131, 107, 0.55); animation: ba-respire 1.8s ease-in-out infinite; }
 @keyframes ba-respire { 50% { transform: scale(1.08); } }
 .ba-pulse { animation: ba-respire 1.2s ease-in-out infinite; }
+.ba-son { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 20px;
+  background: rgba(8, 5, 10, 0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.25s; }
+.ba-son.visible { opacity: 1; }
+.ba-son-boite { width: min(100%, 340px); text-align: center; align-items: stretch; background: var(--surface); border: 1px solid var(--trait);
+  border-radius: 28px; padding: 26px 20px 18px; box-shadow: var(--ombre); transform: scale(0.9); transition: transform 0.4s cubic-bezier(.2,1.4,.4,1); }
+.ba-son.visible .ba-son-boite { transform: none; }
+.ba-son-boite h2 { margin: 0; }
+.ba-son-icone { font-size: 3.2rem; line-height: 1; animation: ba-son 1s ease-in-out infinite; }
+@keyframes ba-son { 50% { transform: scale(1.15) rotate(-6deg); } }
