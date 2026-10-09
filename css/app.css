@@ -64,7 +64,7 @@ html, body { margin: 0; height: 100%; }
 body {
   background: var(--fond);
   background-image: var(--lueur);
-  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--texte);
   font-family: var(--sans);
   font-size: 17px;

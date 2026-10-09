@@ -42,7 +42,14 @@
       background-image: radial-gradient(120% 70% at 50% -10%, rgba(232,131,107,.22), transparent 60%);
       color: #f6ede6; font-family: "Fraunces", Georgia, serif;
       transition: opacity .5s ease, transform .5s ease;
+      contain: layout paint; transform: translateZ(0); -webkit-backface-visibility: hidden; backface-visibility: hidden;
     }
+    /* Largeurs figées : le texte change à chaque image, la mise en page ne doit jamais bouger. */
+    #lancement .l-date { display: flex; justify-content: center; align-items: baseline; gap: .26em; white-space: nowrap; }
+    #l-jour { display: inline-block; width: 1.3em; text-align: right; }
+    #l-mois { display: inline-block; width: 5.1em; text-align: left; }
+    #l-nb { display: inline-block; min-width: 3ch; text-align: right; }
+    #lancement .l-annee, #lancement .l-jours { white-space: nowrap; }
     @media (prefers-color-scheme: light) {
       #lancement { background: #f8f1ea; background-image: radial-gradient(120% 70% at 50% -10%, rgba(196,85,60,.12), transparent 60%); color: #2a1b24; }
       #lancement .l-sur, #lancement .l-jours { color: rgba(42,27,36,.6); }
@@ -92,7 +99,15 @@
         el.classList.add("arrive");
         setTimeout(function () { animFinie = true; cacher(); }, 650);
       }
-      if (reduit) { peindre(1); animFinie = true; } else requestAnimationFrame(boucle);
+      // On attend la police (max 0,7 s) : un changement de police en pleine animation fait sauter le texte.
+      var lance = false;
+      function lancer() { if (lance) return; lance = true; requestAnimationFrame(boucle); }
+      if (reduit) { peindre(1); animFinie = true; }
+      else {
+        peindre(0);
+        try { document.fonts.load('600 1em "Fraunces"').then(lancer, lancer); } catch (e) { lancer(); }
+        setTimeout(lancer, 700);
+      }
       // L'app est prête dès que son écran de chargement interne disparaît.
       document.addEventListener("DOMContentLoaded", function () {
         var app = document.getElementById("app");
