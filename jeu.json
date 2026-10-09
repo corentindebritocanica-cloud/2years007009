@@ -500,7 +500,7 @@
       "jeu": {
         "type": "carte",
         "consigne": "Maintiens ton doigt pour faire la mise au point",
-        "image": "img/jeu/carte-1.svg"
+        "image": "img/jeu/q2-3.jpg"
       },
       "recompense": {
         "titre": "Ta récompense",
@@ -573,7 +573,7 @@
       "jeu": {
         "type": "carte",
         "consigne": "Maintiens ton doigt pour faire la mise au point",
-        "image": "img/jeu/carte-2.svg"
+        "image": "img/jeu/q2-1.jpg"
       },
       "recompense": {
         "titre": "Bravo",
@@ -626,7 +626,7 @@
       "jeu": {
         "type": "carte",
         "consigne": "Maintiens ton doigt pour faire la mise au point",
-        "image": "img/jeu/carte-3.svg"
+        "image": "img/jeu/q2-5.jpg"
       },
       "recompense": {
         "titre": "Ta récompense",
