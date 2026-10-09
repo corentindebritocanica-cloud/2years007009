@@ -223,6 +223,19 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
   // Pop-up unique après la connexion dans l'app installée. iOS exige un appui
   // pour demander l'autorisation : on la demande depuis le bouton de la pop-up.
   let notifProposee = false;
+  let fermerPopNotif = () => {};
+  // iOS peut ne jamais répondre : on n'attend pas plus de 20 s.
+  function demanderPermission() {
+    return Promise.race([
+      Promise.resolve(Notification.requestPermission()).catch(() => Notification.permission),
+      new Promise((r) => setTimeout(() => r(Notification.permission), 20000)),
+    ]);
+  }
+  // Inscription du jeton push, jamais bloquante : 15 s max par essai, 3 essais.
+  function inscrirePush(essai = 1) {
+    Promise.race([fb.synchroniserAppareil(true), new Promise((_, ko) => setTimeout(() => ko(new Error("délai")), 15000))])
+      .catch((e) => { console.error(e); if (essai < 3) setTimeout(() => inscrirePush(essai + 1), 4000 * essai); });
+  }
   function proposerNotifications() {
     if (apercu || notifProposee || !fb.pushPossible() || Notification.permission !== "default") return;
     try { if (sessionStorage.getItem("notif-plus-tard")) return; } catch { /* rien */ }
@@ -239,13 +252,14 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
           h("img", { src: "img/icone-192.png", alt: "" }),
           h("div", {}, h("strong", {}, jeu.meta?.notif?.titre || "Une nouvelle étape t'attend"), h("span", {}, jeu.meta?.notif?.texte || "Ouvre l'app quand tu es prête ✨"))),
         oui, msg, non));
-    const fermer = () => { voile.classList.remove("visible"); setTimeout(() => voile.remove(), 300); };
+    let fermee = false;
+    const fermer = () => { if (fermee) return; fermee = true; voile.classList.remove("visible"); setTimeout(() => voile.remove(), 300); };
+    fermerPopNotif = fermer;
     oui.addEventListener("click", async () => {
       oui.disabled = true;
-      const p = await Notification.requestPermission();
+      const p = await demanderPermission();
       if (p === "granted") {
-        try { await fb.synchroniserAppareil(true); }
-        catch (e) { console.error(e); setTimeout(() => fb.synchroniserAppareil(true).catch(console.error), 4000); }
+        inscrirePush(); // en arrière-plan : ne bloque jamais la pop-up
         voile.querySelector(".pop-cloche").textContent = "✅";
         voile.querySelector("#pop-titre").textContent = "C'est tout bon !";
         vibrer([20, 30, 50]);
@@ -284,11 +298,10 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
     const btn = h("button", { class: "btn plein" }, "Activer les notifications");
     btn.addEventListener("click", async () => {
       btn.disabled = true;
-      const p = await Notification.requestPermission();
-      if (p === "granted") {
-        try { await fb.synchroniserAppareil(true); rendre(); }
-        catch (e) { console.error(e); btn.disabled = false; msg.className = "message erreur"; msg.textContent = "Échec de l'inscription, réessaie."; }
-      } else rendre();
+      const p = await demanderPermission();
+      if (p === "granted") { inscrirePush(); vibrer([20, 30, 50]); }
+      fermerPopNotif();
+      rendre();
     });
     return h("div", { class: "bandeau pile" },
       h("strong", {}, "Une étape s'ouvre tous les 3 jours"),
