@@ -210,7 +210,7 @@ label.etiquette { font-size: 0.85rem; color: var(--texte-2); font-weight: 600; }
 .memoire.bloquee { pointer-events: none; }
 .memoire.perdue .cm { opacity: .45; transition: opacity .3s; }
 .memoire .cm { aspect-ratio: 3 / 4; perspective: 600px; cursor: pointer; }
-.memoire .cm .in { position: relative; width: 100%; height: 100%; transition: transform 0.14s ease-out; transform-style: preserve-3d; }
+.memoire .cm .in { position: relative; width: 100%; height: 100%; transition: transform 0.24s cubic-bezier(.3,1.35,.55,1); transform-style: preserve-3d; }
 .memoire .cm.vue .in, .memoire .cm.trouvee .in { transform: rotateY(180deg); }
 .memoire .face { position: absolute; inset: 0; border-radius: 9px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
 .memoire .dos { background: linear-gradient(135deg, var(--surface-2), var(--surface)); border: 1px solid var(--trait); display: grid; place-items: center; color: var(--ambre); font-family: var(--display); font-size: 1.1rem; }
@@ -238,7 +238,7 @@ html.page-figee, html.page-figee body { overscroll-behavior: none; }
 @keyframes car-pop { 0% { transform: scale(2.4); opacity: 0; } 45% { transform: scale(.95); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
 /* Cadenas */
-.cadenas { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 10px 0; }
+.cadenas { position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 10px 0; }
 .molettes { display: flex; gap: 10px; }
 .molette {
   width: 58px; height: 84px; border-radius: 14px; background: var(--fond-2); border: 1px solid var(--trait);
@@ -475,3 +475,145 @@ html.page-figee, html.page-figee body { overscroll-behavior: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* =====================================================================
+   Animations des mini-jeux (passe UI/UX)
+   ===================================================================== */
+.eclat {
+  position: absolute; z-index: 8; pointer-events: none; font-size: var(--t, 1.1rem); color: var(--c, var(--ambre)); line-height: 1;
+  text-shadow: 0 0 10px currentColor; animation: eclat 1.15s cubic-bezier(.15,.7,.3,1) forwards;
+}
+@keyframes eclat {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(150deg); opacity: 0; }
+}
+.apparait { animation: entree 0.55s cubic-bezier(.2,1.3,.4,1) both; }
+@keyframes flotte { 50% { transform: translateY(-8px) rotate(-3deg); } }
+
+/* Grattage */
+.grattage canvas { transition: opacity 0.85s ease, transform 0.85s ease, filter 0.85s ease; }
+.grattage canvas.efface { opacity: 0; transform: scale(1.12); filter: blur(8px); }
+.grattage.revele .dessous { animation: grat-revele 0.9s cubic-bezier(.2,1.4,.4,1) both;
+  text-shadow: 0 0 26px color-mix(in srgb, var(--ambre) 60%, transparent); }
+@keyframes grat-revele { 0% { transform: scale(0.86); filter: blur(3px); opacity: 0.5; } 60% { transform: scale(1.06); filter: none; opacity: 1; } 100% { transform: scale(1); } }
+.grat-poudre { position: absolute; z-index: 3; width: 5px; height: 5px; margin: -2px; border-radius: 50%; pointer-events: none;
+  background: #ecd09c; box-shadow: 0 0 6px #f7deb0; animation: grat-poudre 0.75s ease-in forwards; }
+@keyframes grat-poudre { to { transform: translate(var(--dx), 50px) scale(0.3); opacity: 0; } }
+.grat-astuce { position: absolute; z-index: 4; left: 50%; top: 66%; font-size: 2.1rem; pointer-events: none;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35)); animation: grat-astuce 1.8s ease-in-out infinite; }
+@keyframes grat-astuce { 0%, 100% { transform: translate(-95%, 0) rotate(-12deg); } 50% { transform: translate(-5%, -8px) rotate(12deg); } }
+
+/* Mémoire */
+.memoire:not(.jouee) .cm { animation: cm-donne 0.5s cubic-bezier(.2,1.3,.4,1) calc(var(--k, 0) * 35ms) backwards; }
+@keyframes cm-donne { from { opacity: 0; transform: translateY(18px) scale(0.8); } }
+.memoire .cm.trouvee { animation: cm-trouvee 0.5s cubic-bezier(.2,1.6,.4,1); }
+.memoire .cm.trouvee .recto { box-shadow: 0 0 0 3px var(--vert) inset, 0 0 16px color-mix(in srgb, var(--vert) 55%, transparent); }
+@keyframes cm-trouvee { 40% { transform: scale(1.14); } }
+.memoire .cm.rate { animation: cm-rate 0.3s; }
+@keyframes cm-rate { 25% { transform: translateX(-4px) rotate(-2deg); } 75% { transform: translateX(4px) rotate(2deg); } }
+.memoire.perdue { animation: secoue 0.4s; }
+.memoire.victoire .cm { animation: cm-vague 0.7s cubic-bezier(.2,1.4,.4,1) calc(var(--k, 0) * 55ms) both; }
+@keyframes cm-vague { 40% { transform: translateY(-14px) scale(1.08) rotate(-3deg); } 100% { transform: none; } }
+.frise figure { animation: frise-in 0.6s cubic-bezier(.2,1.3,.4,1) calc(var(--k, 0) * 120ms) both; }
+@keyframes frise-in { from { opacity: 0; transform: translateX(46px) rotate(5deg) scale(0.9); } }
+
+/* Puzzle */
+.puzzle .piece.juste { animation: piece-juste 0.7s ease-out; }
+@keyframes piece-juste { 0% { box-shadow: inset 0 0 0 3px var(--vert), 0 0 20px var(--vert); filter: brightness(1.25); } 100% { filter: none; } }
+.puzzle.resolu { animation: puzzle-gagne 0.9s cubic-bezier(.2,1.4,.4,1) 0.25s; }
+@keyframes puzzle-gagne { 45% { transform: scale(1.045); box-shadow: 0 0 0 4px var(--ambre), 0 0 40px color-mix(in srgb, var(--ambre) 50%, transparent); } }
+.puzzle-reflet { position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  transform: translateX(-120%); animation: puzzle-reflet 1.1s ease-in-out 0.45s forwards; }
+@keyframes puzzle-reflet { to { transform: translateX(120%); } }
+
+/* Cadenas */
+.cadenas-icone { transform-origin: 50% 15%; animation: cad-balance 3.2s ease-in-out infinite; }
+@keyframes cad-balance { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+.cadenas-icone.force { animation: cad-force 0.55s; }
+@keyframes cad-force { 15%, 55% { transform: rotate(-14deg) translateY(2px); } 35%, 75% { transform: rotate(14deg) translateY(-2px); } }
+.cadenas-icone.ouvert { animation: cad-ouvert 0.8s cubic-bezier(.2,1.6,.4,1); filter: drop-shadow(0 0 22px color-mix(in srgb, var(--ambre) 70%, transparent)); }
+@keyframes cad-ouvert { 0% { transform: scale(0.6) rotate(-20deg); } 50% { transform: scale(1.35) rotate(8deg); } 100% { transform: none; } }
+.molette .defile { display: inline-block; }
+.molette .defile.roule { animation: roule 0.12s ease-out; }
+@keyframes roule { from { transform: translateY(-60%); opacity: 0.3; filter: blur(1.5px); } }
+.molette.trouve { animation: mol-trouve 0.8s cubic-bezier(.2,1.6,.4,1); color: var(--ambre); border-color: var(--ambre);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ambre) 35%, transparent), 0 0 26px color-mix(in srgb, var(--ambre) 45%, transparent); }
+@keyframes mol-trouve { 0% { transform: scale(1); } 40% { transform: scale(1.3) rotate(-4deg); } 100% { transform: none; } }
+.molette.valide { border-color: var(--vert); color: var(--vert); animation: mol-trouve 0.6s cubic-bezier(.2,1.6,.4,1) calc(var(--k, 0) * 90ms) both; }
+.info-pop { animation: entree 0.5s cubic-bezier(.2,1.3,.4,1) both; }
+
+/* Mise au point */
+.floue-astuce { position: absolute; inset: auto 0 22px 0; z-index: 2; text-align: center; pointer-events: none;
+  font-family: var(--display); font-style: italic; font-size: 1.15rem; color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.3s; animation: astuce-respire 2s ease-in-out infinite; }
+@keyframes astuce-respire { 50% { opacity: 0.55; } }
+.carte-floue.appui .floue-astuce, .carte-floue.net .floue-astuce { opacity: 0; animation: none; }
+.carte-floue .anneau { transition: transform 0.3s cubic-bezier(.2,1.4,.4,1), filter 0.3s; }
+.carte-floue.appui .anneau { transform: scale(1.12); filter: drop-shadow(0 0 10px var(--ambre)); }
+.carte-floue.net .anneau { opacity: 0; transition: opacity 0.3s; }
+.carte-floue.net img { animation: net-rebond 0.7s cubic-bezier(.2,1.4,.4,1); }
+@keyframes net-rebond { 0% { transform: scale(1.06); } 100% { transform: scale(1); } }
+.carte-floue .flash { position: absolute; inset: 0; z-index: 4; background: #fff; pointer-events: none; animation: flash 0.55s ease-out forwards; }
+@keyframes flash { 0% { opacity: 0.95; } 100% { opacity: 0; } }
+.carte-floue .coche { position: absolute; right: 14px; bottom: 14px; z-index: 5; width: 54px; height: 54px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--vert); color: #0f2b1b; font-size: 1.6rem; font-weight: 700;
+  animation: car-pop 0.6s cubic-bezier(.2,1.5,.4,1) 0.15s both; }
+
+/* GPS final */
+.carte.gps { position: relative; text-align: center; align-items: center; }
+.gps-enveloppe { font-size: 4rem; animation: flotte 2.6s ease-in-out infinite; filter: drop-shadow(0 8px 18px rgba(232, 131, 107, 0.4)); }
+.gps-suspense { font-family: var(--display); font-style: italic; font-size: 1.5rem; min-height: 1.6em; }
+.gps-suspense.pulse { animation: car-pop 0.7s cubic-bezier(.2,1.5,.4,1); }
+.gps-scene { position: relative; width: 130px; height: 120px; display: grid; place-items: center; }
+.gps-pin { position: relative; z-index: 1; font-size: 3.8rem; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35)); }
+.gps-onde { position: absolute; left: 50%; top: 82%; width: 34px; height: 12px; margin: -6px 0 0 -17px; border-radius: 50%; border: 2px solid var(--ambre); opacity: 0; }
+.gps-lieu { font-family: var(--display); font-weight: 600; font-size: clamp(2rem, 10vw, 2.8rem); line-height: 1.1;
+  background: linear-gradient(100deg, var(--ambre) 15%, #fff6df 40%, var(--rose) 65%, var(--ambre) 90%); background-size: 300% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: anag-brille 3.5s linear infinite; }
+.carte.gps.revele .gps-pin { animation: pin-chute 0.95s cubic-bezier(.3,1.5,.5,1) both; }
+.carte.gps.revele .gps-onde { animation: onde 2s ease-out 0.8s infinite; }
+.carte.gps.revele .gps-onde.d2 { animation-delay: 1.8s; }
+.carte.gps.revele .gps-lieu { animation: anag-in 0.8s cubic-bezier(.2,1.5,.4,1) 0.75s both, anag-brille 3.5s linear 1.6s infinite; }
+.carte.gps.revele .gps-adresse { animation: entree 0.6s ease 1.25s both; }
+.carte.gps.revele .gps-btn { animation: entree 0.5s cubic-bezier(.2,1.3,.4,1) 1.6s both; }
+.carte.gps.revele .gps-btn + .gps-btn { animation-delay: 1.75s; }
+@keyframes pin-chute { 0% { transform: translateY(-170px) scale(0.6); opacity: 0; } 55% { transform: translateY(6px) scale(1.1, 0.85); opacity: 1; } 75% { transform: translateY(-12px); } 100% { transform: none; } }
+@keyframes onde { 0% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(5.5); } }
+
+/* =====================================================================
+   Écrans de la joueuse (passe UI/UX)
+   ===================================================================== */
+.attente .lune { animation: flotte 3.6s ease-in-out infinite; }
+.btn.appel { animation: appel 2.4s ease-in-out infinite; }
+.btn.apparait.appel { animation: entree 0.55s cubic-bezier(.2,1.3,.4,1) both, appel 2.4s ease-in-out 0.6s infinite; }
+@keyframes appel {
+  0%, 100% { box-shadow: 0 6px 18px color-mix(in srgb, var(--ambre) 25%, transparent), 0 0 0 0 color-mix(in srgb, var(--ambre) 45%, transparent); }
+  50% { box-shadow: 0 8px 24px color-mix(in srgb, var(--ambre) 40%, transparent), 0 0 0 8px color-mix(in srgb, var(--ambre) 0%, transparent); }
+}
+.pastille { animation: pastille-in 0.45s cubic-bezier(.2,1.5,.4,1) calc(var(--k, 0) * 28ms) both; transition: transform 0.12s; }
+.pastille[role="button"]:active { transform: scale(0.9); }
+.pastille.actuelle { animation: pastille-in 0.45s cubic-bezier(.2,1.5,.4,1) calc(var(--k, 0) * 28ms) both, halo 2s ease-in-out 1s infinite; }
+@keyframes pastille-in { from { opacity: 0; transform: scale(0.4) translateY(8px); } }
+@keyframes halo { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rose) 55%, transparent); } 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--rose) 0%, transparent); } }
+.progression-etape span.nouveau { transform-origin: left center; animation: barre-pousse 0.8s cubic-bezier(.2,.8,.2,1) 0.2s both; }
+@keyframes barre-pousse { from { transform: scaleX(0); } }
+
+.carte.juste { border-color: var(--vert); animation: juste 0.6s cubic-bezier(.2,1.4,.4,1); }
+.carte.juste .champ { border-color: var(--vert); box-shadow: 0 0 0 3px color-mix(in srgb, var(--vert) 30%, transparent); }
+@keyframes juste { 40% { transform: scale(1.025); box-shadow: var(--ombre), 0 0 0 6px color-mix(in srgb, var(--vert) 25%, transparent); } }
+.juste-badge { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; color: var(--vert);
+  font-weight: 650; font-size: 1.1rem; animation: car-pop 0.6s cubic-bezier(.2,1.5,.4,1) both; }
+.juste-badge span { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 1.3rem;
+  background: var(--vert); color: var(--fond); box-shadow: 0 0 20px color-mix(in srgb, var(--vert) 50%, transparent); }
+.mot-apres { animation: mot-apres 1s cubic-bezier(.2,.8,.2,1) 0.15s both; }
+@keyframes mot-apres { from { opacity: 0; filter: blur(6px); transform: translateY(8px); letter-spacing: 0.03em; } }
+
+.recompense-carte { transform-origin: 50% 0; animation: deplie 0.9s cubic-bezier(.2,1.2,.3,1) both;
+  box-shadow: var(--ombre), 0 0 0 1px color-mix(in srgb, var(--ambre) 30%, transparent), 0 0 40px color-mix(in srgb, var(--ambre) 18%, transparent); }
+.recompense-carte > * { animation: entree 0.6s cubic-bezier(.2,.9,.3,1) both; }
+.recompense-carte > :nth-child(1) { animation-delay: 0.45s; }
+.recompense-carte > :nth-child(2) { animation-delay: 0.65s; }
+.recompense-carte > :nth-child(3) { animation-delay: 0.85s; }
+@keyframes deplie { 0% { opacity: 0; transform: perspective(900px) rotateX(-75deg) translateY(-10px); } 60% { opacity: 1; } 100% { transform: none; } }

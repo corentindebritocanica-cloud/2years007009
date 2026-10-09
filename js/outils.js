@@ -29,8 +29,39 @@ export function melanger(t) {
   return a;
 }
 
+// Retour haptique. Android : Vibration API. iPhone (Safari ne la supporte pas) :
+// basculer un <input switch> caché déclenche le « tic » haptique natif d'iOS 18+.
+let haptique = null, dernierTic = 0;
 export function vibrer(motif) {
-  try { navigator.vibrate?.(motif); } catch { /* iOS ne vibre pas : sans effet */ }
+  try { if (navigator.vibrate) { navigator.vibrate(motif); return; } } catch { /* rien */ }
+  const t = performance.now();
+  if (t - dernierTic < 45) return;
+  dernierTic = t;
+  try {
+    if (!haptique || !haptique.isConnected) {
+      const i = document.createElement("input");
+      i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1;
+      haptique = document.createElement("label");
+      haptique.setAttribute("aria-hidden", "true");
+      haptique.style.cssText = "position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden";
+      haptique.append(i);
+      document.body.append(haptique);
+    }
+    haptique.click();
+  } catch { /* sans effet */ }
+}
+
+// Gerbe d'étincelles autour de (x, y) dans `parent` (qui doit être positionné).
+export function eclat(parent, x, y, { n = 14, symbole = "✦", distance = 90, couleur = "var(--ambre)", taille = "1.1rem" } = {}) {
+  for (let k = 0; k < n; k++) {
+    const a = (Math.PI * 2 * k) / n + Math.random() * 0.5;
+    const d = distance * (0.6 + Math.random() * 0.6);
+    const e = document.createElement("span");
+    e.className = "eclat"; e.textContent = symbole; e.setAttribute("aria-hidden", "true");
+    e.style.cssText = `left:${x}px;top:${y}px;--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px;--c:${couleur};--t:${taille};animation-delay:${Math.random() * 0.12}s`;
+    parent.append(e);
+    setTimeout(() => e.remove(), 1400);
+  }
 }
 
 // Normalisation pour comparer les réponses : minuscules, sans accents,

@@ -3,7 +3,7 @@
 // En mode aperçu (admin), tout est débloqué et RIEN n'est écrit dans Firestore.
 import {
   h, reponseCorrecte, dateParis, jourLong, heureCourte, compteARebours, toDate,
-  estIOS, confettis, tutoInstallation,
+  estIOS, confettis, tutoInstallation, vibrer,
 } from "./outils.js";
 import { lancerJeu } from "./jeux.js";
 import { demanderCode } from "./code.js";
@@ -118,7 +118,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
         h("span", { class: "surtitre" }, enCours.phase),
         h("h2", {}, `L'étape ${enCours.n} t'attend`),
         h("p", { class: "doux" }, etat.prog[enCours.n]?.questionOK ? "Tu l'as commencée, il te reste le mini-jeu." : "Installe-toi confortablement."),
-        h("button", { class: "btn plein", onclick: () => aller({ etape: enCours.n }) }, "Ouvrir l'étape"));
+        h("button", { class: "btn plein appel", onclick: () => aller({ etape: enCours.n }) }, "Ouvrir l'étape"));
     } else if (prochaine) {
       const compte = h("div", { class: "compte" });
       let texte;
@@ -142,9 +142,9 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
         h("p", { class: "doux" }, "Il ne reste plus qu'à vivre la suite."));
     }
 
-    const grille = h("div", { class: "etapes" }, jeu.etapes.map((e) => {
+    const grille = h("div", { class: "etapes" }, jeu.etapes.map((e, k) => {
       const cls = ["pastille", finie(e.n) ? "finie" : ouverte(e.n) ? "ouverte" : "", enCours?.n === e.n ? "actuelle" : ""].join(" ");
-      const el = h("div", { class: cls, role: ouverte(e.n) ? "button" : null, "aria-label": `Étape ${e.n}` }, finie(e.n) ? "✓" : e.n);
+      const el = h("div", { class: cls, role: ouverte(e.n) ? "button" : null, "aria-label": `Étape ${e.n}`, style: `--k:${k}` }, finie(e.n) ? "✓" : e.n);
       if (ouverte(e.n)) el.addEventListener("click", () => aller({ etape: e.n }));
       return el;
     }));
@@ -211,7 +211,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
         h("div", { style: "text-align:center" }, h("div", { class: "surtitre" }, e.phase), h("div", { class: "titre-app" }, e.titre || `Étape ${n}`)),
         h("div", { style: "width:44px" })),
       h("div", { class: "progression-etape", "aria-hidden": "true" },
-        [0, 1, 2].map((i) => h("span", { class: i <= phase ? "fait" : "" }))),
+        [0, 1, 2].map((i) => h("span", { class: i < phase ? "fait" : i === phase ? "fait nouveau" : "" }))),
       corps);
     racine.replaceChildren(ecran);
 
@@ -245,8 +245,10 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
           await ecrireReponse(n, val);
           await ecrireProgression(n, { questionOK: true });
           if (q.motApres) {
-            form.replaceChildren(h("p", { class: "recompense" }, q.motApres),
-              h("button", { class: "btn plein", type: "button", onclick: () => rendre() }, "Continuer"));
+            form.replaceChildren(h("span", { class: "surtitre apparait" }, "Merci 💛"),
+              h("p", { class: "recompense mot-apres" }, q.motApres),
+              h("button", { class: "btn plein apparait", style: "animation-delay:.9s", type: "button", onclick: () => rendre() }, "Continuer"));
+            vibrer(20);
             return;
           }
           return rendre();
@@ -254,6 +256,12 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
         essais++;
         if (reponseCorrecte(val, q.reponses)) {
           await ecrireProgression(n, { questionOK: true, tentatives: essais });
+          champ.blur();
+          form.classList.add("juste");
+          msg.textContent = "";
+          btn.replaceWith(h("div", { class: "juste-badge" }, h("span", {}, "✓"), "Bonne réponse !"));
+          vibrer([20, 30, 50]);
+          await new Promise((r) => setTimeout(r, 1100));
           return rendre();
         }
         ecrireProgression(n, { tentatives: essais }).catch(() => {});
@@ -309,7 +317,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
     nettoyerJeu = lancerJeu(zone, e.jeu, async () => {
       try { await ecrireProgression(n, { jeuOK: true, termineeA: true }); }
       catch (err) { console.error(err); }
-      suite.style.display = "";
+      suite.style.display = ""; suite.classList.add("apparait", "appel");
       suite.scrollIntoView({ behavior: "smooth", block: "end" });
     }, {
       dejaElimines: elimines(n), propre: etat.prog[n]?.elimine,
@@ -320,7 +328,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
 
   function etapeRecompense(n, e, corps) {
     const r = e.recompense || {};
-    corps.append(h("article", { class: "carte pile" },
+    corps.append(h("article", { class: "carte pile recompense-carte" },
       h("span", { class: "surtitre" }, r.titre || "Ta récompense"),
       h("p", { class: "recompense" }, r.texte || ""),
       r.image ? h("img", { src: r.image, alt: "", style: "width:100%;border-radius:14px" }) : null));
@@ -347,7 +355,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
     if (j.type === "colis") return h("div", { class: "bandeau" }, `📦 ${j.indice}`);
     if (j.type === "gps") {
       const zone = h("div", { class: "pile" });
-      lancerJeu(zone, j, () => {});
+      lancerJeu(zone, j, () => {}, { rappel: true });
       return zone;
     }
     return null;

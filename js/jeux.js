@@ -1,6 +1,6 @@
 // Les mini-jeux. Chaque fonction reçoit (zone, config, fini) et appelle fini()
 // une seule fois quand le jeu est gagné. Elle renvoie une fonction de nettoyage.
-import { h, melanger, vibrer, confettis } from "./outils.js";
+import { h, melanger, vibrer, confettis, eclat } from "./outils.js";
 
 export const MINI_JEUX = { grattage, memoire, puzzle, cadenas, anagramme, choix, carte, colis, gps };
 
@@ -20,7 +20,8 @@ export function lancerJeu(zone, cfg, fini, ctx) {
 function grattage(zone, cfg, fini) {
   const dessous = h("div", { class: "dessous" }, cfg.cache || "");
   const canvas = h("canvas");
-  const boite = h("div", { class: "zone-jeu grattage" }, dessous, canvas);
+  const astuce = h("div", { class: "grat-astuce", "aria-hidden": "true" }, "👆");
+  const boite = h("div", { class: "zone-jeu grattage" }, dessous, canvas, astuce);
   zone.append(boite);
 
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
@@ -57,6 +58,11 @@ function grattage(zone, cfg, fini) {
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
     dernier = p;
+    if (compteur % 3 === 0) { // poussière dorée qui tombe sous le doigt
+      const g = h("span", { class: "grat-poudre", style: `left:${p.x}px;top:${p.y}px;--dx:${(Math.random() - 0.5) * 40}px` });
+      boite.append(g); setTimeout(() => g.remove(), 750);
+    }
+    if (compteur % 6 === 0) vibrer(4);
     if (++compteur % 8 === 0) verifier();
   }
   function verifier() {
@@ -66,11 +72,13 @@ function grattage(zone, cfg, fini) {
     for (let i = 3; i < d.length; i += 4 * 24) { total++; if (d[i] === 0) vide++; }
     if (vide / total > 0.55) {
       termine = true;
-      canvas.style.transition = "opacity .7s"; canvas.style.opacity = "0";
-      setTimeout(fini, 500);
+      canvas.classList.add("efface"); boite.classList.add("revele");
+      vibrer([30, 40, 60]);
+      eclat(boite, w / 2, hh / 2, { n: 16, distance: Math.min(w, hh) * 0.55 });
+      setTimeout(fini, 900);
     }
   }
-  canvas.addEventListener("pointerdown", (e) => { actif = true; dernier = null; canvas.setPointerCapture(e.pointerId); gratter(pos(e)); });
+  canvas.addEventListener("pointerdown", (e) => { astuce.remove(); actif = true; dernier = null; canvas.setPointerCapture(e.pointerId); gratter(pos(e)); });
   canvas.addEventListener("pointermove", (e) => { if (actif) gratter(pos(e)); });
   const stop = () => { actif = false; dernier = null; verifier(); };
   canvas.addEventListener("pointerup", stop);
@@ -131,8 +139,8 @@ function memoire(zone, cfg, fini) {
     const grille = h("div", { class: "memoire bloquee" });
     let ouvertes = [], verrou = false, trouvees = 0, enCours = false;
 
-    cartes.forEach((c) => {
-      const el = h("div", { class: "cm", role: "button", "aria-label": "Carte" },
+    cartes.forEach((c, idx) => {
+      const el = h("div", { class: "cm", role: "button", "aria-label": "Carte", style: `--k:${idx}` },
         h("div", { class: "in" },
           h("div", { class: "face dos" }, "♡"),
           h("div", { class: "face recto" }, h("img", { src: c.p.image, alt: "", draggable: "false" }))));
@@ -146,11 +154,14 @@ function memoire(zone, cfg, fini) {
         if (a.c.i === b.c.i) {
           setTimeout(() => {
             a.el.classList.add("trouvee"); b.el.classList.add("trouvee");
+            [a.el, b.el].forEach((x) => eclat(scene, x.offsetLeft + x.offsetWidth / 2, x.offsetTop + x.offsetHeight / 2,
+              { n: 6, symbole: "♥", distance: 34, couleur: "var(--rose)", taille: "0.8rem" }));
             ouvertes = []; verrou = false; trouvees++; vibrer(15);
             if (trouvees === photos.length) gagne();
           }, 150);
         } else {
-          setTimeout(() => { a.el.classList.remove("vue"); b.el.classList.remove("vue"); ouvertes = []; verrou = false; }, 450);
+          setTimeout(() => { a.el.classList.add("rate"); b.el.classList.add("rate"); }, 200);
+          setTimeout(() => { [a.el, b.el].forEach((x) => x.classList.remove("vue", "rate")); ouvertes = []; verrou = false; }, 520);
         }
       });
       grille.append(el);
@@ -159,7 +170,7 @@ function memoire(zone, cfg, fini) {
 
     compteARebours(scene).then(() => {
       if (detruit) return;
-      enCours = true; grille.classList.remove("bloquee");
+      enCours = true; grille.classList.remove("bloquee"); grille.classList.add("jouee");
       const barre = chrono.firstChild;
       requestAnimationFrame(() => {
         barre.style.transition = `width ${DUREE}ms linear`;
@@ -178,8 +189,10 @@ function memoire(zone, cfg, fini) {
       enCours = false; clearTimeout(minuteur); cancelAnimationFrame(raf);
       termine = true;
       const barre = chrono.firstChild; barre.style.width = getComputedStyle(barre).width; barre.style.transition = "none";
+      grille.classList.add("victoire");
+      vibrer([30, 40, 60]);
       confettis();
-      setTimeout(montrerFrise, 700);
+      setTimeout(montrerFrise, 1300);
     }
     function perdu() {
       if (termine) return;
@@ -195,7 +208,7 @@ function memoire(zone, cfg, fini) {
   function montrerFrise() {
     chrono.remove();
     const frise = h("div", { class: "frise" },
-      photos.map((p) => h("figure", {}, h("img", { src: p.image, alt: "" }), p.legende ? h("figcaption", {}, p.legende) : null)));
+      photos.map((p, k) => h("figure", { style: `--k:${k}` }, h("img", { src: p.image, alt: "" }), p.legende ? h("figcaption", {}, p.legende) : null)));
     scene.replaceWith(h("div", { class: "pile" }, h("p", { class: "doux" }, "Nos souvenirs :"), frise));
     fini();
   }
@@ -278,7 +291,7 @@ function puzzle(zone, cfg, fini) {
     el.classList.remove("prise");
     const autre = cible >= 0 ? pieces[ordre[cible]] : null;
     const echange = autre && Math.abs(d) > taille * 0.3;
-    [el, autre].forEach((p) => p && (p.style.transition = "transform .14s ease-out"));
+    [el, autre].forEach((p) => p && (p.style.transition = "transform .2s cubic-bezier(.25,1.3,.5,1)"));
     if (echange) {
       const s = Math.sign(d) * taille;
       el.style.transform = axe === "x" ? `translate(${s}px,0)` : `translate(0,${s}px)`;
@@ -292,9 +305,16 @@ function puzzle(zone, cfg, fini) {
       if (echange) {
         [ordre[c], ordre[cible]] = [ordre[cible], ordre[c]];
         placer();
+        // pièce qui tombe à sa place : petit éclat vert
+        [c, cible].forEach((k) => {
+          if (ordre[k] !== k) return;
+          const pc = pieces[ordre[k]];
+          pc.classList.remove("juste"); void pc.offsetWidth; pc.classList.add("juste");
+          setTimeout(() => pc.classList.remove("juste"), 700);
+        });
         if (ordre.every((v, i) => v === i)) gagne();
       }
-    }, 150);
+    }, 200);
   };
   plateau.addEventListener("pointerup", lacher);
   plateau.addEventListener("pointercancel", lacher);
@@ -302,9 +322,11 @@ function puzzle(zone, cfg, fini) {
   function gagne() {
     resolu = true;
     plateau.classList.add("resolu");
+    plateau.append(h("div", { class: "puzzle-reflet", "aria-hidden": "true" }));
     liberer();
-    confettis();
-    setTimeout(fini, 700);
+    vibrer([30, 40, 60]);
+    setTimeout(confettis, 450);
+    setTimeout(fini, 1500);
   }
   return () => { liberer(); };
 }
@@ -334,8 +356,13 @@ function cadenas(zone, cfg, fini) {
     const tours = 30 + cible; let k = 0;
     const tick = () => {
       span.textContent = String(k % 10); vibrer(4);
+      span.classList.remove("roule"); void span.offsetWidth; span.classList.add("roule");
       if (k >= tours) {
-        molettes[pos].classList.remove("cible");
+        const mol = molettes[pos];
+        mol.classList.remove("cible"); mol.classList.add("trouve");
+        eclat(boite, mol.offsetLeft + mol.offsetWidth / 2, mol.offsetTop + mol.offsetHeight / 2, { n: 12, distance: 70 });
+        vibrer([20, 30, 60]);
+        info.classList.add("info-pop");
         btn.remove();
         if (cfg.final) {
           info.textContent = `Le 4e chiffre est ${cible}. Retrouve les trois autres dans ta mémoire et ouvre le cadenas.`;
@@ -386,11 +413,18 @@ function cadenas(zone, cfg, fini) {
     ouvrir.addEventListener("click", () => {
       if (valeurs.join("") === code) {
         ouvrir.remove(); msg.textContent = "";
-        cadenasEl.textContent = "🔓"; cadenasEl.classList.add("ouvert");
-        vibrer([20, 40, 60]);
-        info.textContent = "Ouvert !";
-        if (cfg.ouverture) boite.append(h("div", { class: "carte" }, h("p", { class: "recompense" }, cfg.ouverture)));
-        setTimeout(fini, 700);
+        boite.querySelectorAll(".molette").forEach((m, i) => { m.style.setProperty("--k", i); m.classList.add("valide"); });
+        cadenasEl.classList.add("force");
+        vibrer(20);
+        setTimeout(() => {
+          cadenasEl.classList.remove("force");
+          cadenasEl.textContent = "🔓"; cadenasEl.classList.add("ouvert");
+          eclat(boite, cadenasEl.offsetLeft + cadenasEl.offsetWidth / 2, cadenasEl.offsetTop + cadenasEl.offsetHeight / 2, { n: 20, distance: 130 });
+          confettis(); vibrer([40, 40, 90]);
+          info.textContent = "Ouvert !"; info.classList.remove("info-pop"); void info.offsetWidth; info.classList.add("info-pop");
+          if (cfg.ouverture) boite.append(h("div", { class: "carte apparait" }, h("p", { class: "recompense" }, cfg.ouverture)));
+          setTimeout(fini, 1200);
+        }, 650);
       } else {
         msg.className = "message erreur"; msg.textContent = "Ce n'est pas le bon code. Rassemble tes 4 chiffres.";
         echecs++;
@@ -400,6 +434,7 @@ function cadenas(zone, cfg, fini) {
           aide.textContent = "Petit coup de pouce : " + [...code].slice(0, indices).map((c, i) => `chiffre n°${i + 1} = ${c}`).join(", ");
         }
         boite.classList.remove("secoue"); void boite.offsetWidth; boite.classList.add("secoue");
+        cadenasEl.classList.remove("force"); void cadenasEl.offsetWidth; cadenasEl.classList.add("force");
         vibrer([30, 50, 30]);
       }
     });
@@ -576,7 +611,8 @@ function carte(zone, cfg, fini) {
   anneau.innerHTML = `<circle cx="27" cy="27" r="22" fill="rgba(0,0,0,.35)" stroke="rgba(255,255,255,.25)" stroke-width="4"/>
     <circle class="arc" cx="27" cy="27" r="22" fill="none" stroke="#f3c98b" stroke-width="4" stroke-linecap="round"
     stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 27 27)"/>`;
-  const boite = h("div", { class: "zone-jeu carte-floue" }, img, anneau);
+  const astuce = h("div", { class: "floue-astuce" }, "Maintiens ton doigt…");
+  const boite = h("div", { class: "zone-jeu carte-floue" }, img, astuce, anneau);
   zone.append(boite);
   const arc = anneau.querySelector(".arc");
   let p = 0, appui = false, dernier = 0, raf, termine = false;
@@ -592,15 +628,22 @@ function carte(zone, cfg, fini) {
       p = Math.min(1, p + (t - dernier) / DUREE);
       if (Math.random() < 0.15) vibrer(3);
       rendre();
-      if (p >= 1) { termine = true; fini(); return; }
+      if (p >= 1) {
+        termine = true; appui = false;
+        boite.classList.remove("appui"); boite.classList.add("net");
+        boite.append(h("div", { class: "flash", "aria-hidden": "true" }), h("div", { class: "coche" }, "✓"));
+        vibrer([20, 40, 60]);
+        setTimeout(fini, 800);
+        return;
+      }
     }
     dernier = t;
     raf = requestAnimationFrame(boucle);
   }
   rendre();
   raf = requestAnimationFrame((t) => { dernier = t; boucle(t); });
-  boite.addEventListener("pointerdown", (e) => { appui = true; boite.setPointerCapture(e.pointerId); });
-  const lacher = () => { appui = false; };
+  boite.addEventListener("pointerdown", (e) => { if (termine) return; appui = true; boite.classList.add("appui"); boite.setPointerCapture(e.pointerId); });
+  const lacher = () => { appui = false; boite.classList.remove("appui"); };
   boite.addEventListener("pointerup", lacher);
   boite.addEventListener("pointercancel", lacher);
   boite.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -624,13 +667,43 @@ function colis(zone, cfg, fini) {
 }
 
 // ---------------------------------------------------------------- GPS (final)
-function gps(zone, cfg, fini) {
+function gps(zone, cfg, fini, ctx) {
   const q = encodeURIComponent(cfg.adresse || "");
-  zone.append(
-    h("div", { class: "carte pile", style: "text-align:center" },
-      h("div", { class: "grand-emoji" }, "📍"),
-      h("p", { class: "question" }, cfg.adresse || ""),
-      h("a", { class: "btn plein", href: `https://maps.apple.com/?daddr=${q}&dirflg=d` }, "Ouvrir dans Plans"),
-      h("a", { class: "btn secondaire plein", href: `https://www.google.com/maps/dir/?api=1&destination=${q}` }, "Ouvrir dans Google Maps")));
-  fini();
+  const lieu = cfg.nomLieu && !/^\(/.test(cfg.nomLieu) ? cfg.nomLieu : ((cfg.adresse || "").match(/\d{5}\s+(.+)$/)?.[1] || "");
+  const boite = h("div", { class: "carte pile gps" });
+  zone.append(boite);
+  const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function montrer(anime) {
+    boite.replaceChildren(
+      h("div", { class: "gps-scene" }, h("span", { class: "gps-onde" }), h("span", { class: "gps-onde d2" }), h("div", { class: "gps-pin" }, "📍")),
+      lieu ? h("p", { class: "gps-lieu" }, lieu) : null,
+      h("p", { class: "question gps-adresse" }, cfg.adresse || ""),
+      h("a", { class: "btn plein gps-btn", href: `https://maps.apple.com/?daddr=${q}&dirflg=d` }, "Ouvrir dans Plans"),
+      h("a", { class: "btn secondaire plein gps-btn", href: `https://www.google.com/maps/dir/?api=1&destination=${q}` }, "Ouvrir dans Google Maps"));
+    if (anime) {
+      boite.classList.add("revele");
+      vibrer([40, 40, 90]);
+      setTimeout(() => {
+        confettis();
+        eclat(boite, boite.offsetWidth / 2, 80, { n: 18, symbole: "♥", couleur: "var(--rose)", distance: 130 });
+      }, 650);
+    }
+    fini();
+  }
+
+  if (ctx.rappel) return montrer(false);
+  const texte = h("p", { class: "gps-suspense" }, "Tu es prête ?");
+  const go = h("button", { class: "btn plein appel" }, "Découvrir où je t'emmène");
+  boite.append(h("div", { class: "gps-enveloppe", "aria-hidden": "true" }, "💌"), texte, go);
+  go.addEventListener("click", async () => {
+    go.remove();
+    for (const m of ["Je t'emmène…", "dans un endroit…", "rien qu'à nous…"]) {
+      texte.textContent = m;
+      texte.classList.remove("pulse"); void texte.offsetWidth; texte.classList.add("pulse");
+      vibrer(20);
+      await attendre(1150);
+    }
+    montrer(true);
+  });
 }
