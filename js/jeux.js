@@ -4,7 +4,7 @@ import { h, melanger, vibrer, confettis } from "./outils.js";
 
 export const MINI_JEUX = { grattage, memoire, puzzle, cadenas, anagramme, choix, carte, colis, gps };
 
-export function lancerJeu(zone, cfg, fini) {
+export function lancerJeu(zone, cfg, fini, ctx) {
   const f = MINI_JEUX[cfg.type];
   if (!f) {
     zone.append(h("p", { class: "doux" }, `Mini-jeu inconnu : ${cfg.type}`));
@@ -13,7 +13,7 @@ export function lancerJeu(zone, cfg, fini) {
   }
   let dejaFini = false;
   const unique = () => { if (!dejaFini) { dejaFini = true; vibrer(30); fini(); } };
-  return f(zone, cfg, unique) || (() => {});
+  return f(zone, cfg, unique, ctx || {}) || (() => {});
 }
 
 // ---------------------------------------------------------------- Grattage
@@ -460,30 +460,37 @@ function anagramme(zone, cfg, fini) {
 }
 
 // ---------------------------------------------------------------- Choix piège
-function choix(zone, cfg, fini) {
-  const deja = new Set(cfg.dejaElimines || []);
+function choix(zone, cfg, fini, ctx) {
+  // Elle élimine librement une destination ; les éliminées des jeux précédents restent grisées.
+  const deja = new Set([...(cfg.dejaElimines || []), ...(ctx.dejaElimines || [])]);
   const msg = h("p", { class: "message" });
-  if (cfg.indice) zone.append(h("div", { class: "bandeau" }, cfg.indice));
+  const els = new Map();
   const liste = h("div", { class: "choix" });
+  const raison = (o) => (o.pourquoi ? ` J'y avais pensé, ${o.pourquoi}.` : "");
+  function griser(o) { deja.add(o.id); els.get(o.id).classList.add("eliminee"); }
   (cfg.options || []).forEach((o) => {
     const el = h("div", { class: "option" + (deja.has(o.id) ? " eliminee" : ""), role: "button" },
       h("img", { src: o.image, alt: "" }), h("div", { class: "nom" }, o.nom));
+    els.set(o.id, el);
     el.addEventListener("click", () => {
-      if (liste.dataset.fini) return;
-      if (o.id === cfg.elimine) {
-        liste.dataset.fini = "1";
-        el.classList.add("eliminee");
-        msg.className = "message ok"; msg.textContent = "Bien vu. Ce n'est pas là." + (o.pourquoi ? ` J'y avais pensé, ${o.pourquoi}.` : "");
-        setTimeout(fini, 900);
-      } else {
-        el.classList.remove("non"); void el.offsetWidth; el.classList.add("non");
-        msg.className = "message erreur"; msg.textContent = "Non… celle-là reste en lice. Essaie encore.";
-        vibrer([20, 40, 20]);
-      }
+      if (liste.dataset.fini || deja.has(o.id)) return;
+      liste.dataset.fini = "1";
+      griser(o);
+      msg.className = "message ok"; msg.textContent = `${o.nom} : éliminée.` + raison(o);
+      Promise.resolve(ctx.enregistrer?.(o.id)).catch((e) => console.error(e));
+      const restantes = (cfg.options || []).filter((x) => !deja.has(x.id));
+      if (restantes.length === 1) { // la dernière tombe toute seule
+        setTimeout(() => {
+          griser(restantes[0]);
+          msg.textContent = `Et ${restantes[0].nom} ?` + raison(restantes[0]);
+        }, 1800);
+        setTimeout(fini, 4200);
+      } else setTimeout(fini, 1200);
     });
     liste.append(el);
   });
   zone.append(liste, msg);
+  if (ctx.propre) { liste.dataset.fini = "1"; setTimeout(fini, 300); } // choix déjà fait avant une coupure
 }
 
 // ---------------------------------------------------------------- Carte floue

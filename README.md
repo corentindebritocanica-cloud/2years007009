@@ -55,7 +55,7 @@ Chaque étape :
   - `puzzle` : `image` (carrée), `taille` (3) — 3-2-1-GO, on glisse une pièce sur sa voisine directe (haut/bas/gauche/droite) pour les échanger ; page figée pendant la partie ; gagné → confettis
   - `cadenas` (virtuel) : `code` (4 chiffres), `position` (1-4) ; seul le chiffre du jour s'affiche, jamais rappelé ensuite (ni récompense, ni rejouer). `final: true` à l'étape 18 → 4e chiffre puis saisie du code ; un chiffre dévoilé tous les 4 échecs ; `ouverture` = message à l'ouverture
   - `anagramme` : `mot`, `indice` (optionnel), `revelation` (message une fois le mot trouvé)
-  - `choix` : `options[]` `{id, nom, image}`, `elimine`, `dejaElimines[]`, `indice`
+  - `choix` : `options[]` `{id, nom, image, pourquoi}` — elle élimine librement une destination (mémorisée dans `progression/{n}.elimine`, grisée aux jeux suivants) ; quand il n'en reste qu'une, elle tombe toute seule
   - `carte` : `image` (floue puis nette en maintenant le doigt)
   - `colis` : `indice` (où trouver le colis)
   - `gps` : `adresse`

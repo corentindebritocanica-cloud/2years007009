@@ -28,6 +28,7 @@ const tests = [
   ["modifier une étape", assertFails(setDoc(doc(C, "etapes/1"), { debloqueeA: serverTimestamp(), mode: "manuel" }))],
   ["progression étape ouverte", assertSucceeds(setDoc(doc(C, "progression/1"), { questionOK: true, tentatives: 1 }, { merge: true }))],
   ["progression étape fermée", assertFails(setDoc(doc(C, "progression/2"), { questionOK: true }))],
+  ["progression destination éliminée", assertSucceeds(setDoc(doc(C, "progression/1"), { elimine: "l2" }, { merge: true }))],
   ["progression champ interdit", assertFails(setDoc(doc(C, "progression/1"), { triche: 1 }, { merge: true }))],
   ["étape terminée", assertSucceeds(setDoc(doc(C, "progression/1"), { jeuOK: true, termineeA: serverTimestamp() }, { merge: true }))],
   ["autre compte écrit progression", assertFails(setDoc(doc(X, "progression/1"), { questionOK: true }))],

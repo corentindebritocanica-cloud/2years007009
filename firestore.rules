@@ -36,10 +36,11 @@ service cloud.firestore {
     match /progression/{n} {
       allow read: if compte();
       allow create, update: if compte() && numeroValide(n) && ouverte(n)
-        && request.resource.data.keys().hasOnly(['questionOK', 'jeuOK', 'termineeA', 'tentatives'])
+        && request.resource.data.keys().hasOnly(['questionOK', 'jeuOK', 'termineeA', 'tentatives', 'elimine'])
         && (!('questionOK' in request.resource.data) || request.resource.data.questionOK is bool)
         && (!('jeuOK' in request.resource.data) || request.resource.data.jeuOK is bool)
         && (!('tentatives' in request.resource.data) || (request.resource.data.tentatives is int && request.resource.data.tentatives < 10000))
+        && (!('elimine' in request.resource.data) || (request.resource.data.elimine is string && request.resource.data.elimine.size() <= 20))
         && (!('termineeA' in request.resource.data) || request.resource.data.termineeA is timestamp);
       allow delete: if compte();
     }

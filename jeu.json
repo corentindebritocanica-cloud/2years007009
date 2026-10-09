@@ -346,8 +346,7 @@
       },
       "jeu": {
         "type": "choix",
-        "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
-        "indice": "",
+        "consigne": "Élimine une destination : ce n'est pas là que je t'emmène.",
         "options": [
           {
             "id": "l1",
@@ -373,9 +372,7 @@
             "image": "img/jeu/leurre-4.svg",
             "pourquoi": "parce que tu adores ça"
           }
-        ],
-        "elimine": "l1",
-        "dejaElimines": []
+        ]
       },
       "recompense": {
         "titre": "Ta récompense",
@@ -425,8 +422,7 @@
       },
       "jeu": {
         "type": "choix",
-        "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
-        "indice": "",
+        "consigne": "Élimine une destination : ce n'est pas là que je t'emmène.",
         "options": [
           {
             "id": "l1",
@@ -452,10 +448,6 @@
             "image": "img/jeu/leurre-4.svg",
             "pourquoi": "parce que tu adores ça"
           }
-        ],
-        "elimine": "l2",
-        "dejaElimines": [
-          "l1"
         ]
       },
       "recompense": {
@@ -529,8 +521,7 @@
       },
       "jeu": {
         "type": "choix",
-        "consigne": "Une de ces destinations n'est PAS la bonne. Laquelle ?",
-        "indice": "",
+        "consigne": "Élimine une destination : ce n'est pas là que je t'emmène.",
         "options": [
           {
             "id": "l1",
@@ -556,11 +547,6 @@
             "image": "img/jeu/leurre-4.svg",
             "pourquoi": "parce que tu adores ça"
           }
-        ],
-        "elimine": "l3",
-        "dejaElimines": [
-          "l1",
-          "l2"
         ]
       },
       "recompense": {

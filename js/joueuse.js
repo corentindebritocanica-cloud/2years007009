@@ -54,6 +54,8 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
   }
 
   const ouverte = (n) => etat.ouvertes.has(n);
+  // Destinations déjà éliminées aux autres jeux « choix » (sauf l'étape `sauf`).
+  const elimines = (sauf) => Object.entries(etat.prog).filter(([m, v]) => Number(m) !== sauf && v?.elimine).map(([, v]) => v.elimine);
   const finie = (n) => !!etat.prog[n]?.termineeA;
 
   // ---------- Routage ----------
@@ -309,6 +311,9 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       catch (err) { console.error(err); }
       suite.style.display = "";
       suite.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, {
+      dejaElimines: elimines(n), propre: etat.prog[n]?.elimine,
+      enregistrer: (id) => ecrireProgression(n, { elimine: id }),
     });
     suite.addEventListener("click", () => { rendre(); confettis(); });
   }
@@ -328,7 +333,7 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       rejouer.remove();
       const zone = h("div", { class: "pile" });
       corps.append(zone);
-      nettoyerJeu = lancerJeu(zone, e.jeu, () => {});
+      nettoyerJeu = lancerJeu(zone, e.jeu, () => {}, { dejaElimines: elimines(n) });
     });
     corps.append(h("button", { class: "btn plein", onclick: () => aller({ accueil: true }) }, "Retour au chemin"));
     if (!["gps", "colis", "cadenas"].includes(e.jeu.type)) corps.append(rejouer);
