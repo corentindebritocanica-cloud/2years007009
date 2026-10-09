@@ -461,36 +461,72 @@ function anagramme(zone, cfg, fini) {
 
 // ---------------------------------------------------------------- Choix piège
 function choix(zone, cfg, fini, ctx) {
-  // Elle élimine librement une destination ; les éliminées des jeux précédents restent grisées.
+  // Elle élimine librement une destination ; les éliminées des jeux précédents restent tamponnées.
+  const options = cfg.options || [];
   const deja = new Set([...(cfg.dejaElimines || []), ...(ctx.dejaElimines || [])]);
-  const msg = h("p", { class: "message" });
   const els = new Map();
   const liste = h("div", { class: "choix" });
-  const raison = (o) => (o.pourquoi ? ` J'y avais pensé, ${o.pourquoi}.` : "");
-  function griser(o) { deja.add(o.id); els.get(o.id).classList.add("eliminee"); }
-  (cfg.options || []).forEach((o) => {
-    const el = h("div", { class: "option" + (deja.has(o.id) ? " eliminee" : ""), role: "button" },
-      h("img", { src: o.image, alt: "" }), h("div", { class: "nom" }, o.nom));
+  const msg = h("p", { class: "choix-message" });
+  const bulle = h("div", { class: "choix-bulle" });
+  const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
+  const phrase = (t) => t ? t.charAt(0).toUpperCase() + t.slice(1).replace(/[.!…]*$/, ".") : "";
+
+  function poussiere(el) {
+    const cx = el.offsetLeft + el.offsetWidth / 2, cy = el.offsetTop + el.offsetHeight * 0.42;
+    for (let k = 0; k < 14; k++) {
+      const a = (Math.PI * 2 * k) / 14 + Math.random() * 0.4, d = 50 + Math.random() * 60;
+      const p = h("span", { class: "poussiere", style: `left:${cx}px;top:${cy}px;--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px` });
+      liste.append(p);
+      setTimeout(() => p.remove(), 800);
+    }
+  }
+  async function tamponner(o) {
+    const el = els.get(o.id);
+    deja.add(o.id);
+    el.classList.add("frappe");
+    await attendre(420);
+    el.classList.add("impact"); poussiere(el); vibrer([50, 40, 80]);
+    await attendre(650);
+    el.classList.remove("frappe", "impact"); el.classList.add("eliminee");
+  }
+  function dire(titre, texte) {
+    bulle.replaceChildren(h("span", { class: "surtitre" }, titre), h("p", { class: "bulle-texte" }, `« ${phrase(texte)} »`));
+    bulle.classList.remove("visible"); void bulle.offsetWidth; bulle.classList.add("visible");
+  }
+
+  options.forEach((o, i) => {
+    const el = h("div", { class: "option" + (deja.has(o.id) ? " eliminee" : ""), role: "button", style: `--i:${i};--r:${[-3, 2.5, 2, -2.5][i % 4]}deg` },
+      h("img", { src: o.image, alt: "" }), h("div", { class: "nom" }, o.nom), h("span", { class: "tampon" }, "ÉLIMINÉ"));
     els.set(o.id, el);
-    el.addEventListener("click", () => {
+    el.addEventListener("click", async () => {
       if (liste.dataset.fini || deja.has(o.id)) return;
-      liste.dataset.fini = "1";
-      griser(o);
-      msg.className = "message ok"; msg.textContent = `${o.nom} : éliminée.` + raison(o);
+      liste.dataset.fini = "1"; liste.classList.add("verrou");
+      msg.textContent = "";
       Promise.resolve(ctx.enregistrer?.(o.id)).catch((e) => console.error(e));
-      const restantes = (cfg.options || []).filter((x) => !deja.has(x.id));
-      if (restantes.length === 1) { // la dernière tombe toute seule
-        setTimeout(() => {
-          griser(restantes[0]);
-          msg.textContent = `Et ${restantes[0].nom} ?` + raison(restantes[0]);
-        }, 1800);
-        setTimeout(fini, 4200);
-      } else setTimeout(fini, 1200);
+      await tamponner(o);
+      dire(`${o.nom} ? J'y avais pensé…`, o.pourquoi || "Mais non.");
+      const restantes = options.filter((x) => !deja.has(x.id));
+      if (restantes.length === 1) { // la dernière tombe toute seule, avec un peu de suspense
+        const der = restantes[0], elD = els.get(der.id);
+        await attendre(2200);
+        msg.textContent = "Et il n'en reste plus qu'une…";
+        elD.classList.add("derniere");
+        await attendre(2000);
+        elD.classList.remove("derniere");
+        msg.textContent = "";
+        await tamponner(der);
+        dire(`Et ${der.nom} ? J'y avais pensé aussi…`, der.pourquoi || "Mais non.");
+        await attendre(1200);
+        msg.textContent = "Aucune de ces destinations. Alors… où ? 🤫";
+        await attendre(1200);
+      } else await attendre(1400);
+      fini();
     });
     liste.append(el);
   });
-  zone.append(liste, msg);
-  if (ctx.propre) { liste.dataset.fini = "1"; setTimeout(fini, 300); } // choix déjà fait avant une coupure
+  zone.append(liste, msg, bulle);
+  setTimeout(() => els.forEach((el) => el.classList.add("posee")), options.length * 120 + 800);
+  if (ctx.propre) { liste.dataset.fini = "1"; liste.classList.add("verrou"); setTimeout(fini, 300); } // choix déjà fait avant une coupure
 }
 
 // ---------------------------------------------------------------- Carte floue
