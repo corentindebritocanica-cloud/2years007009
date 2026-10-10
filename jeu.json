@@ -127,6 +127,12 @@
       "recompense": {
         "titre": "Ta récompense",
         "texte": "La nuit de notre premier baiser, une étoile filante a traversé le ciel. J'ai pris ça comme un signe, même si je ne crois pas aux signes. Depuis, chaque fois que je lève les yeux la nuit, c'est à toi que je pense."
+      },
+      "video": {
+        "n": 1,
+        "titre": "Il y a un siècle…",
+        "src": "video/ba-1.mp4",
+        "affiche": "video/ba-1.jpg"
       }
     },
     {
@@ -262,6 +268,12 @@
       "recompense": {
         "titre": "Bravo",
         "texte": "Une étape de plus. 💛"
+      },
+      "video": {
+        "n": 2,
+        "titre": "Le tirage",
+        "src": "video/ba-2.mp4",
+        "affiche": "video/ba-2.jpg"
       }
     },
     {
@@ -367,6 +379,12 @@
       "recompense": {
         "titre": "Ta récompense",
         "texte": "Une chose que je peux te dire : ça va te dépayser."
+      },
+      "video": {
+        "n": 3,
+        "titre": "Le petit hibou",
+        "src": "video/ba-3.mp4",
+        "affiche": "video/ba-3.jpg"
       }
     },
     {
@@ -495,6 +513,12 @@
       "recompense": {
         "titre": "Ta récompense",
         "texte": "Prévois un pull bien chaud. Et pas seulement à cause du froid… 🔥"
+      },
+      "video": {
+        "n": 4,
+        "titre": "Trois points d'appui",
+        "src": "video/ba-4.mp4",
+        "affiche": "video/ba-4.jpg"
       }
     },
     {
@@ -593,6 +617,12 @@
       "recompense": {
         "titre": "Bravo",
         "texte": "Une étape de plus. 💛"
+      },
+      "video": {
+        "n": 5,
+        "titre": "Minuit passé",
+        "src": "video/ba-5.mp4",
+        "affiche": "video/ba-5.jpg"
       }
     },
     {
@@ -673,6 +703,12 @@
       "recompense": {
         "titre": "Joyeux anniversaire",
         "texte": "Deux ans, et j'ai tout prévu. Joyeux anniversaire mon amour 💛"
+      },
+      "video": {
+        "n": 6,
+        "titre": "La dernière",
+        "src": "video/ba-6.mp4",
+        "affiche": "video/ba-6.jpg"
       }
     }
   ]

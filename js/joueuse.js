@@ -177,12 +177,26 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       if ((!testBandeAnnonce && (apercu || deja)) || !BANDE_ANNONCE) { baEtat = "finie"; return ensuite(); }
       baEtat = "encours";
     } else if (document.querySelector(".ba-voile")) return;
-    const video = h("video", { src: BANDE_ANNONCE, poster: "video/affiche.jpg", playsinline: true, "webkit-playsinline": true, preload: "auto" });
-    const lecture = h("button", { class: "ba-lecture", "aria-label": "Lancer la bande-annonce" }, "▶");
-    // Avant la lecture : pop-up « monte le son » au centre, la vidéo part depuis son bouton.
+    ouvrirVideo({
+      src: BANDE_ANNONCE, affiche: "video/affiche.jpg",
+      surtitre: revoir ? "Bande-annonce" : "Avant de commencer",
+      sonAvant: !revoir, finTexte: revoir ? "Fermer" : "Je suis prête ✨", finVisible: revoir,
+      surFermer: () => {
+        if (!testBandeAnnonce) try { localStorage.setItem("bande-annonce-vue", "1"); } catch { /* rien */ }
+        if (!revoir) { baEtat = "finie"; ensuite(); }
+      },
+    });
+  }
+
+  // Lecteur plein écran commun (bande-annonce et ciné-annonces des étapes).
+  // sonAvant : pop-up « monte le son » avant la lecture ; finVisible : bouton de fermeture dès le début.
+  function ouvrirVideo({ src, affiche, surtitre, sonAvant, finTexte, finVisible, surFermer }) {
+    if (document.querySelector(".ba-voile")) return;
+    const video = h("video", { src, poster: affiche, playsinline: true, "webkit-playsinline": true, preload: "auto" });
+    const lecture = h("button", { class: "ba-lecture", "aria-label": "Lancer la vidéo" }, "▶");
     lecture.addEventListener("click", () => {
       if (voile.querySelector(".ba-son")) return; // double appui
-      if (revoir) { video.muted = false; video.play().catch(() => {}); return; }
+      if (!sonAvant) { video.muted = false; video.play().catch(() => {}); return; }
       vibrer(15);
       const ok = h("button", { class: "btn plein" }, "C'est fait, lance !");
       const son = h("div", { class: "ba-son", role: "alertdialog", "aria-labelledby": "ba-son-titre" },
@@ -201,21 +215,56 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       requestAnimationFrame(() => son.classList.add("visible"));
     });
     video.addEventListener("play", () => { lecture.remove(); video.controls = true; });
-    // « Je suis prête » n'apparaît qu'à la fin de la vidéo (ou si elle ne peut pas se lire).
-    const fin = h("button", { class: `btn plein ba-fin${revoir ? " visible" : ""}` }, revoir ? "Fermer" : "Je suis prête ✨");
+    // Le bouton de fin n'apparaît qu'à la fin de la vidéo (ou si elle ne peut pas se lire).
+    const fin = h("button", { class: `btn plein ba-fin${finVisible ? " visible" : ""}` }, finTexte);
     const montrerFin = () => { fin.classList.add("visible", "ba-pulse"); vibrer([20, 30, 50]); };
     video.addEventListener("ended", montrerFin);
     video.addEventListener("error", montrerFin);
-    const fermer = () => {
-      if (!testBandeAnnonce) try { localStorage.setItem("bande-annonce-vue", "1"); } catch { /* rien */ }
+    fin.addEventListener("click", () => {
       video.pause();
       voile.classList.remove("visible");
-      setTimeout(() => { voile.remove(); if (!revoir) { baEtat = "finie"; ensuite(); } }, 350);
-    };
-    fin.addEventListener("click", fermer);
-    const voile = h("div", { class: "ba-voile", role: "dialog", "aria-modal": "true", "aria-label": "Bande-annonce" },
-      h("span", { class: "surtitre" }, revoir ? "Bande-annonce" : "Avant de commencer"),
+      setTimeout(() => { voile.remove(); surFermer?.(); }, 350);
+    });
+    const voile = h("div", { class: "ba-voile", role: "dialog", "aria-modal": "true", "aria-label": surtitre },
+      h("span", { class: "surtitre" }, surtitre),
       h("div", { class: "ba-cadre" }, video, lecture), fin);
+    document.body.append(voile);
+    requestAnimationFrame(() => voile.classList.add("visible"));
+  }
+
+  // Ciné-annonces : une vidéo dans la récompense de certaines étapes (champ « video » de jeu.json).
+  // La première fois, elle s'ouvre seule avec le rappel du son ; ensuite elle se revoit librement.
+  const cleEpisode = (v) => `ciné-annonce-vue-${v.n}`;
+  function episodeVu(v) { try { return !!localStorage.getItem(cleEpisode(v)); } catch { return false; } }
+  function ouvrirEpisode(v, nouveau) {
+    ouvrirVideo({
+      src: v.src, affiche: v.affiche, surtitre: `Bande-annonce ${v.n} / 6`,
+      sonAvant: nouveau, finTexte: nouveau ? "Continuer ✨" : "Fermer", finVisible: !nouveau,
+      surFermer: () => { try { localStorage.setItem(cleEpisode(v), "1"); } catch { /* rien */ } },
+    });
+  }
+  // Vidéos déjà débloquées : la bande-annonce de départ + celles des étapes terminées.
+  function videosDebloquees() {
+    const liste = BANDE_ANNONCE ? [{ titre: "La bande-annonce", sous: "Le début du jeu", ouvrir: () => proposerBandeAnnonce(() => {}, true) }] : [];
+    jeu.etapes.forEach((e) => {
+      if (!e.video || !(apercu || etat.prog[e.n]?.jeuOK)) return;
+      liste.push({ titre: e.video.titre, sous: `Bande-annonce ${e.video.n} / 6`, ouvrir: () => ouvrirEpisode(e.video, false) });
+    });
+    return liste;
+  }
+  function choisirVideo() {
+    const liste = videosDebloquees();
+    if (liste.length === 1) return liste[0].ouvrir();
+    const fermer = () => { voile.classList.remove("visible"); setTimeout(() => voile.remove(), 300); };
+    const voile = h("div", { class: "pop-voile", role: "dialog", "aria-modal": "true", "aria-label": "Bandes-annonces" },
+      h("div", { class: "pop-boite pile" },
+        h("h2", {}, "🎬 Bandes-annonces"),
+        h("div", { class: "pile ba-liste" }, liste.map((v) =>
+          h("button", { class: "ba-item", onclick: () => { fermer(); setTimeout(v.ouvrir, 320); } },
+            h("span", { class: "ba-item-play", "aria-hidden": "true" }, "▶"),
+            h("span", { class: "pile", style: "gap:2px;text-align:left" }, h("strong", {}, v.titre), h("small", {}, v.sous))))),
+        h("button", { class: "btn fantome", onclick: fermer }, "Fermer")));
+    voile.addEventListener("click", (ev) => { if (ev.target === voile) fermer(); });
     document.body.append(voile);
     requestAnimationFrame(() => voile.classList.add("visible"));
   }
@@ -278,8 +327,9 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       if (!ouvrirAdmin) return;
       if (await demanderCode()) ouvrirAdmin();
     });
-    const revoir = BANDE_ANNONCE
-      ? h("button", { class: "btn fantome petit", onclick: () => proposerBandeAnnonce(() => {}, true) }, "🎬 Revoir la bande-annonce")
+    const nbVideos = videosDebloquees().length;
+    const revoir = nbVideos
+      ? h("button", { class: "btn fantome petit", onclick: choisirVideo }, nbVideos > 1 ? "🎬 Revoir les bandes-annonces" : "🎬 Revoir la bande-annonce")
       : null;
     return h("footer", { class: "pied" }, revoir, logo,
       lectureSeule ? h("p", { class: "discret" }, "Appareil admin · tes actions ici ne sont pas enregistrées") : null);
@@ -443,6 +493,15 @@ export function demarrerJeu(racine, fb, jeu, user, { apercu = false, lectureSeul
       h("span", { class: "surtitre" }, r.titre || "Ta récompense"),
       h("p", { class: "recompense" }, r.texte || ""),
       r.image ? h("img", { src: r.image, alt: "", style: "width:100%;border-radius:14px" }) : null));
+
+    if (e.video) {
+      corps.append(h("button", { class: "carte ba-carte", onclick: () => ouvrirEpisode(e.video, false) },
+        h("img", { src: e.video.affiche, alt: "" }),
+        h("span", { class: "pile", style: "gap:4px;text-align:left" },
+          h("span", { class: "surtitre" }, `Bande-annonce ${e.video.n} / 6`),
+          h("strong", {}, e.video.titre), h("small", { class: "doux" }, "▶ Regarder"))));
+      if (!apercu && !episodeVu(e.video)) setTimeout(() => ouvrirEpisode(e.video, true), 700);
+    }
 
     const rappel = rappelJeu(e.jeu);
     if (rappel) corps.append(rappel);
