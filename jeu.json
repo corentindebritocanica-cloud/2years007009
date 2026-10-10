@@ -130,7 +130,7 @@
       },
       "video": {
         "n": 1,
-        "titre": "Il y a un siècle…",
+        "titre": "Le chemin",
         "src": "video/ba-1.mp4",
         "affiche": "video/ba-1.jpg"
       }
@@ -271,7 +271,7 @@
       },
       "video": {
         "n": 2,
-        "titre": "Le tirage",
+        "titre": "Le voyage",
         "src": "video/ba-2.mp4",
         "affiche": "video/ba-2.jpg"
       }
@@ -382,7 +382,7 @@
       },
       "video": {
         "n": 3,
-        "titre": "Le petit hibou",
+        "titre": "Nos souvenirs",
         "src": "video/ba-3.mp4",
         "affiche": "video/ba-3.jpg"
       }
@@ -516,7 +516,7 @@
       },
       "video": {
         "n": 4,
-        "titre": "Trois points d'appui",
+        "titre": "Plus près",
         "src": "video/ba-4.mp4",
         "affiche": "video/ba-4.jpg"
       }
@@ -620,7 +620,7 @@
       },
       "video": {
         "n": 5,
-        "titre": "Minuit passé",
+        "titre": "Le compte à rebours",
         "src": "video/ba-5.mp4",
         "affiche": "video/ba-5.jpg"
       }
@@ -706,7 +706,7 @@
       },
       "video": {
         "n": 6,
-        "titre": "La dernière",
+        "titre": "Le départ",
         "src": "video/ba-6.mp4",
         "affiche": "video/ba-6.jpg"
       }
