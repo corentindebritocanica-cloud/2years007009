@@ -1,9 +1,35 @@
 // Tableau de bord admin : suivi des 21 étapes, réponses de Lisa, journal du relais,
 // déblocage manuel (étape 21 et secours), notifications de test, aperçu du jeu.
-import { h, dateParis, dateCourte, toDate, toast, agir } from "./outils.js";
-import { RELAIS_URL } from "./config.js";
+import { h, dateParis, dateCourte, jourLong, toDate, toast, agir } from "./outils.js";
+import { RELAIS_URL, BANDE_ANNONCE } from "./config.js";
 import { verrouillerAdmin } from "./code.js";
 import { demarrerJeu } from "./joueuse.js";
+
+// Toutes les vidéos, à regarder librement depuis l'admin (rien n'est marqué « vu »).
+function sectionVideos(jeu) {
+  const videos = [
+    ...(BANDE_ANNONCE ? [{ titre: "La bande-annonce", sous: "Après la première connexion", src: BANDE_ANNONCE, affiche: "video/affiche.jpg" }] : []),
+    ...jeu.etapes.filter((e) => e.video).map((e) => ({ titre: e.video.titre, sous: `Bande-annonce ${e.video.n} / 6 · étape ${e.n} · ${jourLong(new Date(`${e.date}T12:00:00`))}`, src: e.video.src, affiche: e.video.affiche })),
+  ];
+  return h("section", { class: "carte pile" },
+    h("h3", {}, "🎬 Vidéos"),
+    h("div", { class: "pile ba-liste" }, videos.map((v) =>
+      h("button", { class: "ba-item", onclick: () => regarder(v) },
+        h("span", { class: "ba-item-play", "aria-hidden": "true" }, "▶"),
+        h("span", { class: "pile", style: "gap:2px;text-align:left" }, h("strong", {}, v.titre), h("small", {}, v.sous))))));
+}
+function regarder(v) {
+  if (document.querySelector(".ba-voile")) return;
+  const video = h("video", { src: v.src, poster: v.affiche, playsinline: true, "webkit-playsinline": true, controls: true, autoplay: true, preload: "auto" });
+  const fermer = () => { video.pause(); voile.classList.remove("visible"); setTimeout(() => voile.remove(), 350); };
+  const voile = h("div", { class: "ba-voile", role: "dialog", "aria-modal": "true", "aria-label": v.titre },
+    h("span", { class: "surtitre" }, v.titre),
+    h("div", { class: "ba-cadre" }, video),
+    h("button", { class: "btn plein", onclick: fermer }, "Fermer"));
+  document.body.append(voile);
+  requestAnimationFrame(() => voile.classList.add("visible"));
+  video.play().catch(() => {});
+}
 
 export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
   const { db, fs } = fb;
@@ -124,7 +150,8 @@ export function demarrerAdmin(racine, fb, jeu, user, { retour } = {}) {
         h("span", { class: "espace" }),
         h("div", { class: "pile", style: "gap:2px;text-align:right" }, h("span", { class: "surtitre" }, "Terminées"), h("strong", { style: "font-size:1.4rem" }, `${finies} / 21`))),
       h("div", { class: "carte" }, jeu.etapes.map(ligneEtape)),
-      h("button", { class: "btn secondaire plein", onclick: debloquerTout }, "🔓 Tout débloquer d'un coup"));
+      h("button", { class: "btn secondaire plein", onclick: debloquerTout }, "🔓 Tout débloquer d'un coup"),
+      sectionVideos(jeu));
   }
 
   function ligneEtape(e) {
